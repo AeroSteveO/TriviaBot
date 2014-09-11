@@ -2,7 +2,10 @@ TriviaBot
 =========
 
 Java port of Rawsonj's python TriviaBot
+
 https://github.com/rawsonj/triviabot
+
+Bot is built using PIRCBOTX 2.0.1
 
 Features
 --------
