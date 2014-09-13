@@ -6,6 +6,7 @@
 
 package triviabot;
 
+import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.Configuration.*;
@@ -17,13 +18,25 @@ import org.pircbotx.hooks.managers.BackgroundListenerManager;
 
 /**
  *
- * @author Stephen
+ * @author Steve-O
  */
 public class TriviaBot extends ListenerAdapter {
     
     @Override
     public void onMessage(final MessageEvent event) throws Exception {
-// in case something should be done here
+        String message = Colors.removeFormattingAndColors(event.getMessage().trim());
+        if (message.startsWith(Global.commandPrefix)){
+            if(message.split(Global.commandPrefix)[1].equalsIgnoreCase("source")){
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "My current source can be found at: https://github.com/AeroSteveO/TriviaBot Which is based on: https://github.com/rawsonj/triviabot");
+            }
+            if(message.split(Global.commandPrefix)[1].equalsIgnoreCase("help")){
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "Hi, I'm "+Global.botOwner+"'s trivia bot");
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "Commands: score, standings, giveclue, help, next, skip, source");
+                if(Global.botAdmins.contains(event.getUser().getNick())){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: die, set <user> <score>, start, stop, save");
+                }
+            }
+        }
     }
     @Override
     // Rejoin on Kick
@@ -50,24 +63,10 @@ public class TriviaBot extends ListenerAdapter {
                 .setAutoNickChange(true) //Automatically change nick when the current one is in use
                 .setCapEnabled(true) //Enable CAP features
                 .addAutoJoinChannel("#rapterverse")
-//.addCapHandler(new TLSCapHandler(new UtilSSLSocketFactory().trustAllCertificates(), true))
                 .setAutoReconnect(true)
                 .setMaxLineLength(425)
-                .setListenerManager(BackgroundListener)//Allow for logger background listener
+//                .setListenerManager(BackgroundListener)//Allow for logger background listener
                 .addListener(new TriviaBot())
-//                .addListener(new Ignite())
-//                .addListener(new Laser())
-//                .addListener(new Logger())
-//                .addListener(new RandChan())
-//                .addListener(new Shakespeare())
-//                .addListener(new GameBomb())
-//                .addListener(new GameMasterMind())
-//                .addListener(new GameHangman())
-//                .addListener(new GameOmgword())
-//                .addListener(new GameReverse())
-//                .addListener(new GameAltReverse())
-//                .addListener(new EnglishSayings())
-//                .addListener(new SimplePing())
                 .setServerHostname("irc.stevensnet.info"); //Join the official #pircbotx channel
         //.buildConfiguration();
 //        BackgroundListener.addListener(new Logger(),true); //Add logger background listener
