@@ -77,17 +77,18 @@ public class TriviaBot extends ListenerAdapter {
     public void onMessage(final MessageEvent event) throws Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage().trim());
         if (message.startsWith(Global.commandPrefix)){
-            if(message.split(Global.commandPrefix)[1].equalsIgnoreCase("source")){
+            String command = message.split(Global.commandPrefix)[1].toLowerCase();
+            if(command.equalsIgnoreCase("source")){
                 event.getBot().sendIRC().notice(event.getUser().getNick(), "My current source can be found at: https://github.com/AeroSteveO/TriviaBot Which is based on: https://github.com/rawsonj/triviabot");
             }
-            if(message.split(Global.commandPrefix)[1].equalsIgnoreCase("help")){
+            else if(command.equalsIgnoreCase("help")){
                 event.getBot().sendIRC().notice(event.getUser().getNick(), "Hi, I'm "+Global.botOwner+"'s trivia bot");
                 event.getBot().sendIRC().notice(event.getUser().getNick(), "Commands: score, standings, giveclue, help, next, skip, source");
                 if(Global.botAdmins.contains(event.getUser().getNick())){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: die, set <user> <score>, start, stop, save");
                 }
             }
-            if(message.split(Global.commandPrefix)[1].toLowerCase().startsWith("test")){
+            else if(command.startsWith("test")){
                 String answer = message.split(" ",2)[1];
                 Answer test = new Answer(answer);
                 event.respond(test.getClue()+" for "+test.reveal());
@@ -97,7 +98,7 @@ public class TriviaBot extends ListenerAdapter {
                 event.respond(test.giveClue());
                 event.respond(test.giveClue());
             }
-            if (message.equalsIgnoreCase(Global.commandPrefix+"die")||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
+            else if (command.equalsIgnoreCase("die")){//||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
                 if (event.getUser().getNick().equals("Steve-O")){
                     Global.reconnect = false;
                     event.getBot().sendIRC().message(event.getChannel().getName(), "I still make Trebek look bad");
@@ -135,13 +136,13 @@ public class TriviaBot extends ListenerAdapter {
         BackgroundListenerManager BackgroundListener = new BackgroundListenerManager();
         
         Configuration.Builder configuration = new Configuration.Builder()
-                .setName("TriviaBot") //Set the nick of the bot. CHANGE IN YOUR CODE
-                .setLogin("LQ") //login part of hostmask, eg name:login@host
-                .setAutoNickChange(true) //Automatically change nick when the current one is in use
-                .setCapEnabled(true) //Enable CAP features
+                .setName("TriviaBot")                // Set the nick of the bot. CHANGE IN YOUR CODE
+                .setLogin("TriviaBot")               // login part of hostmask, eg name:login@host
+                .setAutoNickChange(true)             // Automatically change nick when the current one is in use
+                .setCapEnabled(true)                 // Enable CAP features
                 .addAutoJoinChannel("#rapterverse")
                 .setAutoReconnect(true)
-                .setMaxLineLength(425)
+                .setMaxLineLength(425)               // This is for the IRC networks I use, it can be increased/decreased as needed
 //                .setListenerManager(BackgroundListener)//Allow for logger background listener
                 .addListener(new TriviaBot())
                 .setServerHostname("irc.stevensnet.info"); //Join the official #pircbotx channel
