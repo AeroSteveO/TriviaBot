@@ -6,6 +6,7 @@
 
 package triviabot;
 
+import java.util.Random;
 import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -35,6 +36,27 @@ public class TriviaBot extends ListenerAdapter {
                 if(Global.botAdmins.contains(event.getUser().getNick())){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: die, set <user> <score>, start, stop, save");
                 }
+            }
+            if(message.split(Global.commandPrefix)[1].toLowerCase().startsWith("test")){
+                String answer = message.split(" ",2)[1];
+                Answer test = new Answer(answer);
+                event.respond(test.getCurrentClue()+" for "+test.reveal());
+            }
+            if (message.equalsIgnoreCase(Global.commandPrefix+"die")||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
+                if (event.getUser().getNick().equals("Steve-O")){
+                    Global.reconnect = false;
+                    event.getBot().sendIRC().message(event.getChannel().getName(), "I still make Trebek look bad");
+                    Random generator = new Random();
+                    int i = generator.nextInt(2);
+                    if (i == 0) {
+                        event.getBot().sendIRC().quitServer("Found by WATSON");
+                    } else {
+                        event.getBot().sendIRC().quitServer("Pesky humans still can't answer my questions");
+                    }
+                    System.exit(0);
+                }
+                else
+                    event.getChannel().send().kick(event.getUser(), "PART 5! BOOBY TRAP THE STALEMATE BUTTON!"); // kick people for trying to kill the bot
             }
         }
     }
@@ -74,13 +96,16 @@ public class TriviaBot extends ListenerAdapter {
         //bot.connect throws various exceptions for failures
         try {
             Global.bot = new PircBotX(config);
+            Runner parallel = new Runner(Global.bot);
+            Thread t = new Thread(parallel);
+            parallel.giveT(t);
+            t.start();
             //PircBotX bot = new PircBotX(configuration);
-            //Connect to the freenode IRC network
-            Global.bot.startBot();
-        } //In your code you should catch and handle each exception seperately,
-        //but here we just lump them all togeather for simpliciy
+            //Global.bot.startBot();
+        }
         catch (Exception ex) {
             ex.printStackTrace();
+            System.out.printf("Failed to start bot\n");
         }
     }
 }
