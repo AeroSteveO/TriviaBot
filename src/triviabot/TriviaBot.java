@@ -90,7 +90,7 @@ public class TriviaBot extends ListenerAdapter {
             if(message.split(Global.commandPrefix)[1].toLowerCase().startsWith("test")){
                 String answer = message.split(" ",2)[1];
                 Answer test = new Answer(answer);
-                event.respond(test.getCurrentClue()+" for "+test.reveal());
+                event.respond(test.getClue()+" for "+test.reveal());
                 event.respond(test.giveClue());
                 event.respond(test.giveClue());
                 event.respond(test.giveClue());

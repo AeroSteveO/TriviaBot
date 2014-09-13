@@ -8,12 +8,22 @@ package triviabot;
 
 /**
  *
- * @author Steve-O
+ * @author Steve-O    
+ *   This class implements storage for an answer you want to conceal 
+ *   and give clues 1 letter at a time.
+ *
+ *   Methods:
+ *
+ *   giveClue(): returns the masked string after revealing a letter and saving the mask.
+ *   getClue(): returns the masked string.
+ *   setAnswer('string'): makes this object reusable, sets a new answer and clue mask.
+ *   reveal(): returns the answer string.
+ *   mask(String): returns the masked answer
+ * 
  */
 public class Answer {
     String answer=null;
     String maskedAnswer=null;
-    
     
     public Answer(String inputAnswer){
         this.answer=inputAnswer;
@@ -40,9 +50,7 @@ public class Answer {
         boolean charChange = false;
         while (!charChange){
             try{
-//                if (!Character.isDigit(maskedAnswer.charAt(charLocation))&&!Character.isLetter(maskedAnswer.charAt(charLocation))){
-//                    
-//                    
+//                if (!Character.isDigit(maskedAnswer.charAt(charLocation))&&!Character.isLetter(maskedAnswer.charAt(charLocation))){  
 //                }
                 if (this.maskedAnswer.charAt(charLocation)=='*'){
                     if (charLocation<answer.length()-2)
@@ -60,7 +68,7 @@ public class Answer {
         }
         return this.maskedAnswer;
     }
-    public String getCurrentClue(){
+    public String getClue(){
         return this.maskedAnswer;
     }
     public void setAnswer(String newAnswer){
