@@ -145,6 +145,7 @@ public class TriviaBot extends ListenerAdapter {
                 .setMaxLineLength(425)               // This is for the IRC networks I use, it can be increased/decreased as needed
 //                .setListenerManager(BackgroundListener)//Allow for logger background listener
                 .addListener(new TriviaBot())
+                .addListener(new TriviaMain())
                 .setServerHostname("irc.stevensnet.info"); //Join the official #pircbotx channel
         //.buildConfiguration();
 //        BackgroundListener.addListener(new Logger(),true); //Add logger background listener
