@@ -1,0 +1,1 @@
+end trivia after 5 questions with no answers from users, or no chat from users
