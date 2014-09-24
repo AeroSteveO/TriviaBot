@@ -146,6 +146,8 @@ public class TriviaBot extends ListenerAdapter {
 //                .setListenerManager(BackgroundListener)//Allow for logger background listener
                 .addListener(new TriviaBot())
                 .addListener(new TriviaMain())
+                .addListener(new TriviaKick())
+                .addListener(new BotControl())
                 .setServerHostname("irc.stevensnet.info"); //Join the official #pircbotx channel
         //.buildConfiguration();
 //        BackgroundListener.addListener(new Logger(),true); //Add logger background listener

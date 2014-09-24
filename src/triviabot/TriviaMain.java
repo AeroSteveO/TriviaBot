@@ -52,9 +52,13 @@ public class TriviaMain extends ListenerAdapter{
 //<theDoctor> for the kicker
 //<theDoctor> no ban on kickee
         
+        // get 3 votes to start trivia without an op, otherwise ops can start, ops or norm can stop
+        
+        // local and global score, one for current trivia session, one for overall points scored in trivia
         
     }
     
+    // IMPLEMENTED IN QUESTION OBJECT
     private String loadRandomQuestionFromFile(){
 //        ArrayList<String> questions = new ArrayList<>();
         ArrayList<File> fileList = getQuestionFileList();
@@ -63,6 +67,7 @@ public class TriviaMain extends ListenerAdapter{
         String randomQuestion = questions.get((int) (Math.random()*questions.size()-1));
         return randomQuestion;
     }
+    // IMPLEMENTED IN QUESTION OBJECT
     private ArrayList<File> getQuestionFileList(){
 //        ArrayList<String> questionFiles = new ArrayList<>();
         File folder = new File("questions/");
@@ -78,6 +83,7 @@ public class TriviaMain extends ListenerAdapter{
         }
         return listOfFiles;
     }
+    // IMPLEMENTED IN QUESTION OBJECT
     private ArrayList<String> loadQuestionFile(File file) {
         try{
             Scanner wordfile = new Scanner(file);
