@@ -16,7 +16,7 @@ package triviabot;
  *
  *   giveClue(): returns the masked string after revealing a letter and saving the mask.
  *   getClue(): returns the masked string.
- *   setAnswer('string'): makes this object reusable, sets a new answer and clue mask.
+ *   setAnswer(String): makes this object reusable, sets a new answer and clue mask.
  *   reveal(): returns the answer string.
  *   mask(String): returns the masked answer
  * 
@@ -46,7 +46,6 @@ public class Answer {
     }
     public String giveClue(){
         int charLocation = (int) (Math.random()*this.answer.length()-1);
-        
         boolean charChange = false;
         while (!charChange){
             try{
@@ -73,6 +72,7 @@ public class Answer {
     }
     public void setAnswer(String newAnswer){
         this.answer=newAnswer;
+        this.maskedAnswer=mask(this.answer);
     }
     public String reveal(){
         return(this.answer);
