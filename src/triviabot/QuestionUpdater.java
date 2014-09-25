@@ -40,8 +40,8 @@ public class QuestionUpdater implements Runnable{
     }
     @Override
     public void run() {
-        this.bot.sendIRC().message(this.channel,"Question:");
-        this.bot.sendIRC().message(this.channel, this.question.getQuestion());
+//        this.bot.sendIRC().message(this.channel,"Question:");
+//        this.bot.sendIRC().message(this.channel, this.question.getQuestion());
         this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.getClue());
         int counter = 1;
         try{
