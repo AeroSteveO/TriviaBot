@@ -1,1 +1,3 @@
 end trivia after 5 questions with no answers from users, or no chat from users
+get 3 votes to start trivia without an op, otherwise ops can start or stop
+local and global score, one for current trivia session, one for overall points scored in trivia
