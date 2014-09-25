@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package triviabot;
+package Objects;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -54,8 +54,10 @@
 * players, wait some, then continue.
 */
 
-package triviabot;
+package TriviaBot;
 
+import Objects.Runner;
+import Objects.Answer;
 import java.util.Random;
 import org.pircbotx.Colors;
 import org.pircbotx.Configuration;

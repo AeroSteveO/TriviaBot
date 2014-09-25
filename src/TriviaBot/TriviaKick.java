@@ -4,8 +4,11 @@
 * and open the template in the editor.
 */
 
-package triviabot;
+package TriviaBot;
 
+import Objects.TimedWaitForQueue;
+import Objects.Question;
+import Objects.Answer;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;

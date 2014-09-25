@@ -4,8 +4,9 @@
 * and open the template in the editor.
 */
 
-package triviabot;
+package Objects;
 
+import TriviaBot.Global;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;

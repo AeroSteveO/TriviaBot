@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package triviabot;
+package TriviaBot;
 
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;

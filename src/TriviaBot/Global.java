@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package triviabot;
+package TriviaBot;
 
 import java.util.ArrayList;
 import org.pircbotx.PircBotX;
@@ -23,10 +23,10 @@ import org.pircbotx.PircBotX;
  *
  */
 public class Global {
-    public static String botOwner = "Steve-O"; //Updated in the Main .java file from Setings.XML
+    public static String botOwner = "Steve-O"; 
     public static ArrayList<String> botAdmins = getBotAdmins();
-    public static String mainNick = "TriviaBot";     //Updated in the Main .java file from Setings.XML
-    public static String nickPass = ""; //Updated in the Main .java file from Setings.XML
+    public static String mainNick = "TriviaBot";     
+    public static String nickPass = ""; 
     public static boolean reconnect = true;
     public static PircBotX bot;
     public static String commandPrefix = "!";

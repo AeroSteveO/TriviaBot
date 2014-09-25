@@ -4,12 +4,13 @@
   * and open the template in the editor.
   */
 
-package triviabot;
+package TriviaBot;
 
+import Objects.Vote;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
-import triviabot.Vote.VoteLog;
+import Objects.Vote.VoteLog;
 
 /**
  *

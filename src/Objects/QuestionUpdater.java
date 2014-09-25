@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package triviabot;
+package Objects;
 
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
