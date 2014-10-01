@@ -15,8 +15,25 @@ import org.pircbotx.hooks.events.MessageEvent;
 /**
  *
  * @author Steve-O
+ * Object: 
+ *      Question
+ * - Requires no input, sets up a new random question upon creation
+ *   Requires input to start automatic question/clue updating if setup this way
+ * - Also accepts input of a message event, answer, question, and time 
+ *   Automatic question/clue updating starts upon object creation
+ * 
+ * Methods:
+ *     *startQuestionUpdates - Starts the automatic question/clue updating
+ *     *endQuestionUpdates   - Ends the automatic question/clue updating
+ *     *getNewQuestion       - Gets a new question to allow the object to be reused
+ *     *getAnswer            - Returns the answer to the current question as a string
+ *     *getQuestion          - Gets the question string for trivia use
+ *      loadRandomQuestionFromFile - Loads a random question line from a random question file
+ *      getQuestionFileList        - Gets a list of all files in the question folder
+ *      loadQuestionFile           - Returns an ArrayList containing all the questions in the input file name
  *
- *
+ * Note: Only commands marked with a * are available for use outside the object
+ * 
  */
 public class Question {
     private String question=null;

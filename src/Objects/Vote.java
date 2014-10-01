@@ -12,7 +12,7 @@ import org.joda.time.DateTime;
 /**
  *
  * @author Steve-O
- * OBJECT: 
+ * Object: 
  *      Vote
  * - Vote requires name of voter to prevent multiple votes by the same person
  * - Votes expire 10 minutes after being added, to prevent a game from starting 
@@ -21,15 +21,15 @@ import org.joda.time.DateTime;
  * Methods:
  *      isAfterExpiration - Checks to see if a vote is after the expiration time
  * 
- * OBJECT:
+ * Object: 
  *      VoteLog
  * - An ArrayList of votes for simple control of the object
  * - Votes can be added to the log using addVote, this allows the object to control
  *   vote expiration and prevent duplicates
  * Methods:
- *      *start       - Returns true if there are enough votes to start the game
+ *     *start        - Returns true if there are enough votes to start the game
  *      containsVote - Returns true if the nickname already voted in this round of voting
- *      *addVote     - Adds the vote to the vote log only if the user hasn't voted yet in this round
+ *     *addVote      - Adds the vote to the vote log only if the user hasn't voted yet in this round
  *      purge        - Removes all votes that are after expiration
  *
  * Note: Only commands marked with a * are available for use outside the object
