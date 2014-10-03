@@ -52,7 +52,7 @@ public class Answer {
 //                if (!Character.isDigit(maskedAnswer.charAt(charLocation))&&!Character.isLetter(maskedAnswer.charAt(charLocation))){  
 //                }
                 if (this.maskedAnswer.charAt(charLocation)=='*'){
-                    if (charLocation<answer.length()-2)
+                    if (charLocation<=answer.length()-2)
                         this.maskedAnswer=this.maskedAnswer.substring(0,charLocation)+this.answer.charAt(charLocation)+this.maskedAnswer.substring(charLocation+1);
                     else
                         this.maskedAnswer=this.maskedAnswer.substring(0,charLocation)+this.answer.charAt(charLocation);
