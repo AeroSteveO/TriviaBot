@@ -53,6 +53,7 @@ public class TriviaKick extends ListenerAdapter{
                         String currentChan = CurrentEvent.getChannel().getName();
                         if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))){
                             event.getBot().sendIRC().message(triviaChan,"Times Up! You've failed in your attempt to kick "+kickee+". ");
+                            event.getBot().sendIRC().message(triviaChan,"The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(event.getUser().getNick()), "You are the weakest link, goodbye");
                             running = false;
