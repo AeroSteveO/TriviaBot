@@ -15,13 +15,13 @@ import org.pircbotx.hooks.events.MessageEvent;
 /**
  *
  * @author Steve-O
- * Object: 
+ * Object:
  *      Question
  * - Requires no input, sets up a new random question upon creation
  *   Requires input to start automatic question/clue updating if setup this way
- * - Also accepts input of a message event, answer, question, and time 
+ * - Also accepts input of a message event, answer, question, and time
  *   Automatic question/clue updating starts upon object creation
- * 
+ *
  * Methods:
  *     *startQuestionUpdates - Starts the automatic question/clue updating
  *     *endQuestionUpdates   - Ends the automatic question/clue updating
@@ -33,13 +33,14 @@ import org.pircbotx.hooks.events.MessageEvent;
  *      loadQuestionFile           - Returns an ArrayList containing all the questions in the input file name
  *
  * Note: Only commands marked with a * are available for use outside the object
- * 
+ *
  */
 public class Question {
     private String question=null;
     private String answer=null;
     private Thread t;
     QuestionUpdater runnable;
+    private int key = 0;
     
     public Question(){
         getNewQuestion();
@@ -54,6 +55,13 @@ public class Question {
     
     public void startQuestionUpdates(MessageEvent event,Answer answer, Question question, int time){
         this.runnable = new QuestionUpdater(event,answer, this, time);
+        this.t = new Thread(runnable);
+        this.runnable.giveT(t);
+        t.start();
+    }
+    public void startQuestionUpdates(MessageEvent event,Answer answer, Question question, int time, int key){
+        this.key = key;
+        this.runnable = new QuestionUpdater(event,answer, this, time, key);
         this.t = new Thread(runnable);
         this.runnable.giveT(t);
         t.start();
