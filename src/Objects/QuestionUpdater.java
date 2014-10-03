@@ -23,7 +23,7 @@ import org.pircbotx.hooks.events.MessageEvent;
  *              send any more updates to the channel after this is used
  *     *run   - The heart of the auto-updating, a looped thread
  * 
- * 
+ * Note: Only commands marked with a * are available for use outside the object
  */
 public class QuestionUpdater implements Runnable{
     private PircBotX bot;
