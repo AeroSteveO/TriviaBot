@@ -12,6 +12,18 @@ import org.pircbotx.hooks.events.MessageEvent;
 /**
  *
  * @author Steve-O
+ * Object: 
+ *      QuestionUpdater
+ * - Requires multiple inputs to properly send out updates to the channel
+ * - Automatically gets a new clue to the question and sends that clue to the channel
+ * 
+ * Methods:
+ *     *giveT - Gives a thread to the object
+ *     *end   - Ends the automatic updating, isn't an instant stop, but it won't
+ *              send any more updates to the channel after this is used
+ *     *run   - The heart of the auto-updating, a looped thread
+ * 
+ * 
  */
 public class QuestionUpdater implements Runnable{
     private PircBotX bot;
@@ -22,7 +34,7 @@ public class QuestionUpdater implements Runnable{
     private Question question;
     private int time;
     
-    QuestionUpdater(MessageEvent event,Answer answer, Question question, int time){
+    QuestionUpdater(MessageEvent event, Answer answer, Question question, int time){
         this.bot = event.getBot();
         this.channel = event.getChannel().getName();
         this.answer = answer;
