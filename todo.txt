@@ -4,3 +4,9 @@ local and global score, one for current trivia session, one for overall points s
 
 !duel user to challenge user to duel, waits for challenge accepted type of phrase to start
 !duel to make general duel challenge, waits for second person to use !duel to start the duel
+
+
+-Create question add/request system
+-Users add questions to be verified and approved by ops
+-List out questions waiting for approval/disapproval
+-Create new text file for questions added by irc people, make sure they don't end up repeating extremely frequently
