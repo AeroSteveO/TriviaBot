@@ -78,39 +78,35 @@ public class TriviaMain extends ListenerAdapter{
                 if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))){
                     event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
                     
-                    
-//                    running = false;
                     kickQuestion.endQuestionUpdates();
-//                    timedQueue.end();
                     kickQuestion.getNewQuestion();
+                    
                     kickAnswer.setAnswer(kickQuestion.getAnswer());
                     event.getBot().sendIRC().message(triviaChan,"Next Question:");
                     event.getBot().sendIRC().message(triviaChan,kickQuestion.getQuestion());
                     kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates,key);
                 }
-                else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())){
-                    
+                else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&currentChan.equalsIgnoreCase(triviaChan)){
                     event.getBot().sendIRC().message(triviaChan,CurrentEvent.getUser().getNick()+" GOT IT!");
                     
-                    running = false;
                     kickQuestion.endQuestionUpdates();
-//                    timedQueue.end();
                     kickQuestion.getNewQuestion();
+                    
                     kickAnswer.setAnswer(kickQuestion.getAnswer());
                     event.getBot().sendIRC().message(triviaChan,"Next Question:");
                     event.getBot().sendIRC().message(triviaChan,kickQuestion.getQuestion());
                     kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates,key);
                 }
-                else if (CurrentEvent.getMessage().equalsIgnoreCase(Global.commandPrefix+"stop")){
+                else if (CurrentEvent.getMessage().equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)){
                     event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!");
                     running = false;
                     kickQuestion.endQuestionUpdates();
 //                    timedQueue.end();
                 }
-                if(!CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))&&CurrentEvent.getChannel().getName().equalsIgnoreCase(event.getChannel().getName())){
+                if(!CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))&&CurrentEvent.getChannel().getName().equalsIgnoreCase(triviaChan)){
                     questionsTillEnd = numQuestionsAllowedTillEnd;
                 }
-                else //if(CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
+                else if (currentChan.equalsIgnoreCase(triviaChan)) //if(CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
                     questionsTillEnd--;
                 if(questionsTillEnd==0){
                     event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!a");
