@@ -26,10 +26,11 @@ import java.util.Vector;
  *      TriviaArray
  * - Array of TriviaGames
  * Methods:
- *     *isActive   - Returns true if the channel is currently active, false if not
- *     *activate   - Sets the channel to active state of trivia
- *     *deactivate - Sets the channel to in-active state of trivia
- *     *getChannel - Returns the channel string of the object
+ *     *isActive      - Returns true if the channel is currently active, false if not
+ *     *activate      - Sets the channel to active state of trivia
+ *     *deactivate    - Sets the channel to in-active state of trivia
+ *     *getChannel    - Returns the channel string of the object
+ *     *clearInactive - Removes all inactive TriviaGames objects from the array
  *
  */
 public class TriviaGames {
@@ -86,6 +87,14 @@ public class TriviaGames {
         }
         public void deactivate(String channel){
             this.get(this.getGameIdx(channel)).deactivate();
+        }
+        public void clearInactive(){
+            for(int i = 0; i < this.size(); i++) {
+                if (!this.get(i).isActive()) {
+                    this.remove(i);
+                    i--;
+                }
+            }
         }
     }
 }
