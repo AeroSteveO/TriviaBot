@@ -23,7 +23,9 @@ import org.pircbotx.hooks.events.MessageEvent;
  *      !kick [user]
  *          Starts a trivia game in which the caller can answer a trivia
  *          question to get the user kicked, if the caller of the function fails,
- *          they get a 1 minute ban and kicked from the chan
+ *          they get a 1 minute ban and kicked from the chan, if the user answers
+ *          the question before the caller does, the caller gets a 1 min ban
+ *          and kicked
  *
  */
 public class TriviaKick extends ListenerAdapter{
@@ -51,7 +53,7 @@ public class TriviaKick extends ListenerAdapter{
                     while (running){
                         MessageEvent CurrentEvent = timedQueue.waitFor(MessageEvent.class);
                         String currentChan = CurrentEvent.getChannel().getName();
-                        if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))){
+                        if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))&&currentChan.equalsIgnoreCase(triviaChan)){
                             event.getBot().sendIRC().message(triviaChan,"Times Up! You've failed in your attempt to kick "+kickee+". ");
                             event.getBot().sendIRC().message(triviaChan,"The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
@@ -61,7 +63,15 @@ public class TriviaKick extends ListenerAdapter{
                             timedQueue.end();
                             
                         }
-                        else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kicker)){
+                        else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kickee)&&currentChan.equalsIgnoreCase(triviaChan)){
+                            event.getBot().sendIRC().message(triviaChan,kickee.toUpperCase()+", YOU HAVE DEFEATED "+kicker.toUpperCase()+" AT HIS OWN GAME");
+                            event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
+                            event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kicker), "You are the weakest link, goodbye");
+                            running = false;
+                            kickQuestion.endQuestionUpdates();
+                            timedQueue.end();
+                        }
+                        else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kicker)&&currentChan.equalsIgnoreCase(triviaChan)){
                             event.getBot().sendIRC().message(triviaChan,kicker.toUpperCase()+", YOU HAVE SUCCEEDED!");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kickee), "You are the weakest link, goodbye");
                             running = false;
