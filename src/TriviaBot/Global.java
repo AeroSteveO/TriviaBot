@@ -20,14 +20,14 @@ import Objects.TriviaGames.TriviaArray;
  * commandPrefix - The character that signals the bot that a command is being sent
  * reconnect     - Boolean to activate the aggressive server reconnect loop
  * bot           - Current PircBotX bot object
- * 
+ * activeGames   - Currently active channels with trivia running in them
  *
  */
 public class Global {
     public static String botOwner = "Steve-O"; 
     public static ArrayList<String> botAdmins = getBotAdmins();
     public static String mainNick = "TriviaBot";     
-    public static String nickPass = "dertriviabert"; 
+    public static String nickPass = ""; 
     public static boolean reconnect = true;
     public static PircBotX bot;
     public static String commandPrefix = "!";
