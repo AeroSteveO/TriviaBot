@@ -68,51 +68,57 @@ public class TriviaMain extends ListenerAdapter{
             event.getBot().sendIRC().message(event.getChannel().getName(),"Question:");
             event.getBot().sendIRC().message(event.getChannel().getName(), kickQuestion.getQuestion());
             int key=(int) (Math.random()*100000+1);
-            WaitForQueue timedQueue = new WaitForQueue(event.getBot());
+            WaitForQueue queue = new WaitForQueue(event.getBot());
             kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates, key);
             boolean running = true;
             int questionsTillEnd = numQuestionsAllowedTillEnd;
             while (running){
-                MessageEvent CurrentEvent = timedQueue.waitFor(MessageEvent.class);
-                String currentChan = CurrentEvent.getChannel().getName();
-                if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))){
-                    event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
+                MessageEvent currentEvent = queue.waitFor(MessageEvent.class);
+                String currentMessage = Colors.removeFormattingAndColors(currentEvent.getMessage());
+                String currentChan = currentEvent.getChannel().getName();
+                if (currentMessage.equalsIgnoreCase(Integer.toString(key))){
+                    if(questionsTillEnd==0){
+                        event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
+                        event.getBot().sendIRC().message(triviaChan,"Looks like nobody is around, Thanks for playing trivia! Come again soon!");
+                        running = false;
+                        kickQuestion.endQuestionUpdates();
+                        queue.close();
+                    }
+                    else{
+                        event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
+                        
+                        kickQuestion.endQuestionUpdates();
+                        kickQuestion = new Question();
+                        
+                        kickAnswer = new Answer(kickQuestion.getAnswer());
+                        event.getBot().sendIRC().message(triviaChan,"Next Question:");
+                        event.getBot().sendIRC().message(triviaChan,kickQuestion.getQuestion());
+                        kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates,key);
+                    }
+                }
+                else if (currentMessage.equalsIgnoreCase(kickQuestion.getAnswer())&&currentChan.equalsIgnoreCase(triviaChan)){
+                    event.getBot().sendIRC().message(triviaChan,currentEvent.getUser().getNick()+" GOT IT!");
                     
                     kickQuestion.endQuestionUpdates();
-                    kickQuestion.getNewQuestion();
+                    kickQuestion = new Question();
                     
-                    kickAnswer.setAnswer(kickQuestion.getAnswer());
+                    kickAnswer = new Answer(kickQuestion.getAnswer());
                     event.getBot().sendIRC().message(triviaChan,"Next Question:");
                     event.getBot().sendIRC().message(triviaChan,kickQuestion.getQuestion());
                     kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates,key);
                 }
-                else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&currentChan.equalsIgnoreCase(triviaChan)){
-                    event.getBot().sendIRC().message(triviaChan,CurrentEvent.getUser().getNick()+" GOT IT!");
-                    
-                    kickQuestion.endQuestionUpdates();
-                    kickQuestion.getNewQuestion();
-                    
-                    kickAnswer.setAnswer(kickQuestion.getAnswer());
-                    event.getBot().sendIRC().message(triviaChan,"Next Question:");
-                    event.getBot().sendIRC().message(triviaChan,kickQuestion.getQuestion());
-                    kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates,key);
-                }
-                else if (CurrentEvent.getMessage().equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)){
+                else if (currentMessage.equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)){
                     event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!");
                     running = false;
                     kickQuestion.endQuestionUpdates();
-//                    timedQueue.end();
+                    queue.close();
                 }
-                if(!CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))&&CurrentEvent.getChannel().getName().equalsIgnoreCase(triviaChan)){
+                if(!currentMessage.equalsIgnoreCase(Integer.toString(key))&&currentEvent.getChannel().getName().equalsIgnoreCase(triviaChan)){
                     questionsTillEnd = numQuestionsAllowedTillEnd;
+                    System.out.println("questions till end reset");
                 }
-                else if (currentChan.equalsIgnoreCase(triviaChan)) //if(CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
+                else if (currentChan.equalsIgnoreCase(triviaChan)) //if(currentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
                     questionsTillEnd--;
-                if(questionsTillEnd==0){
-                    event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!a");
-                    running = false;
-                    kickQuestion.endQuestionUpdates();
-                }
             }
         }
     }
