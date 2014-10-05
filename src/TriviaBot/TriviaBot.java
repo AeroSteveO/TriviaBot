@@ -65,6 +65,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.Configuration.*;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectEvent;
+import org.pircbotx.hooks.events.InviteEvent;
 import org.pircbotx.hooks.events.KickEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.managers.BackgroundListenerManager;
@@ -124,6 +125,12 @@ public class TriviaBot extends ListenerAdapter {
         if (event.getRecipient().getNick().equals(event.getBot().getNick())) {
             event.getBot().sendIRC().joinChannel(event.getChannel().getName());
         }
+    }
+    @Override
+    // Joins channels it has been invited to
+    public void onInvite(InviteEvent event) {
+        event.getBot().sendIRC().joinChannel(event.getChannel());
+//        Global.channels.add(new ChannelStore(event.getChannel())); //think this will work?
     }
     @Override
     // Set mode +B for Bots
