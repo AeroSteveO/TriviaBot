@@ -50,24 +50,25 @@ public class Question {
         QuestionUpdater runnable = new QuestionUpdater(event,answer, this, time);
         this.t = new Thread(runnable);
         runnable.giveT(t);
-        t.start();
+        this.t.start();
     }
     
     public void startQuestionUpdates(MessageEvent event,Answer answer, Question question, int time){
         this.runnable = new QuestionUpdater(event,answer, this, time);
         this.t = new Thread(runnable);
         this.runnable.giveT(t);
-        t.start();
+        this.t.start();
     }
     public void startQuestionUpdates(MessageEvent event,Answer answer, Question question, int time, int key){
         this.key = key;
-        this.runnable = new QuestionUpdater(event,answer, this, time, key);
+        this.runnable = new QuestionUpdater(event,answer, this, time, this.key);
         this.t = new Thread(runnable);
         this.runnable.giveT(t);
-        t.start();
+        this.t.start();
     }
     public void endQuestionUpdates() throws InterruptedException{
         this.runnable.end();
+        this.t.join();
     }
     public void getNewQuestion(){
         String[] tmp = loadRandomQuestionFromFile().split("`");

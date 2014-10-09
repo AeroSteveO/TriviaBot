@@ -29,7 +29,7 @@ import org.pircbotx.hooks.events.MessageEvent;
 public class QuestionUpdater implements Runnable{
     private PircBotX bot;
     private Thread t;
-    private boolean running = false;
+    private boolean running = true;
     private String channel = null;
     private Answer answer;
     private Question question;
@@ -63,24 +63,27 @@ public class QuestionUpdater implements Runnable{
         this.running = false;
         t.join(1000); //Ensure the thread also closes
     }
+//    public void setRunningTrue(){
+//        this.running = true;
+//    }
     @Override
     public void run() {
-//        this.bot.sendIRC().message(this.channel,"Question:");
-//        this.bot.sendIRC().message(this.channel, this.question.getQuestion());
+        this.running = true;
         this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.getClue());
         int counter = 1;
         try{
-            this.t.sleep(this.time*1000);
+            Thread.sleep(this.time*1000);
         }
         catch(Exception ex){
             ex.printStackTrace();
             System.out.println(ex.getMessage());
         }
+        System.out.println(this.running);
         while (this.running&&counter<4){
+            System.out.println("Bing an update");
             try {
-//                this.bot.sendIRC().message(this.channel, this.question.getQuestion());
                 this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.giveClue());
-                this.t.sleep(this.time*1000);
+                Thread.sleep(this.time*1000);
                 counter++; // just to make sure the queue stops before giving out more hints than it should
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
@@ -91,6 +94,7 @@ public class QuestionUpdater implements Runnable{
             bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(key)));
             System.out.println("PING PONG");
         }
-        counter = 1;
+//        counter = 1;
+//        this.running = true;
     }
 }
