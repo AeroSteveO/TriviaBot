@@ -82,12 +82,10 @@ public class TriviaKick extends ListenerAdapter{
                 }
                 else {
                     event.getBot().sendIRC().notice(event.getUser().getNick(), Colors.BOLD+"KICK: "+Colors.NORMAL+"user not in channel");
-                    return;
                 }
             }
             else if(command.equalsIgnoreCase("kick")){
                 event.getChannel().send().kick(event.getUser(),"Okay, I can do that");
-                return;
             }
         }
     }
