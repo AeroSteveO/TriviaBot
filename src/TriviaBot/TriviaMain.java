@@ -8,13 +8,22 @@ package TriviaBot;
 
 import Objects.Answer;
 import Objects.Question;
+import Objects.Score;
+import Objects.Score.ScoreArray;
 import Objects.TimedWaitForQueue;
 import Objects.Vote;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 import Objects.Vote.VoteLog;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.UnmodifiableIterator;
+import java.util.Comparator;
+import java.util.Iterator;
+import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
+import org.pircbotx.hooks.events.JoinEvent;
+import org.pircbotx.hooks.events.UserListEvent;
 
 /**
  *
@@ -33,6 +42,10 @@ public class TriviaMain extends ListenerAdapter{
     VoteLog startVotes = new Vote.VoteLog();                     // Log of current Votes for starting trivia
     VoteLog stopVotes  = new Vote.VoteLog();                     // Log of current Votes for stopping trivia
     
+    ScoreArray scores = new ScoreArray();
+    String filename = "scores.json";
+    boolean loaded = startScores();
+    
     @Override
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
@@ -49,6 +62,16 @@ public class TriviaMain extends ListenerAdapter{
             }
             else if (command.equalsIgnoreCase("end")&&Global.botAdmins.contains(event.getUser().getNick())){
                 runTrivia = false;
+            }
+            else if (command.equalsIgnoreCase("score")){
+                event.respond("Your current score is: "+scores.getScore(event.getUser().getNick()));
+            }
+            else if (command.matches("score\\s[a-z\\|]+")){
+                String user = command.split(" ")[1];
+                event.respond(user+"'s current score is: "+scores.getScore(user));
+            }
+            else if (command.equalsIgnoreCase("save")&&Global.botAdmins.contains(event.getUser().getNick())){
+                scores.saveToJSON();
             }
         }
         
@@ -115,5 +138,43 @@ public class TriviaMain extends ListenerAdapter{
                     questionsTillEnd--;
             }
         }
+    }
+    public boolean startScores(){
+        boolean loaded;
+        try{
+            scores.setFilename(filename);
+            loaded = scores.loadFromJSON();
+        }
+        catch (Exception ex){
+            System.out.println("SCORES FAILED TO LOAD");
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public void onJoin(JoinEvent event){
+        if (!scores.containsUser(event.getUser().getNick())){
+            scores.add(new Score(event.getUser().getNick()));
+            scores.saveToJSON();
+        }
+    }
+    @Override
+    public void onUserList(UserListEvent event){
+        ImmutableSortedSet users = event.getUsers();
+        
+        Iterator<User> iterator = users.iterator();
+        boolean modified = false;
+        while(iterator.hasNext()) {
+            User element = iterator.next();
+            if (!scores.containsUser(element.getNick())){
+                //temp = (User)users.floor(temp);
+                scores.add(new Score(element.getNick()));
+                System.out.println(element.getNick());
+                modified = true;
+            }
+        }
+        if (modified)
+                scores.saveToJSON();
     }
 }
