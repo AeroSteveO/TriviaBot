@@ -53,6 +53,15 @@ public class Question {
         this.t.start();
     }
     
+    public Question(MessageEvent event,Answer answer, Question question, int time, int key ){
+        getNewQuestion();
+        this.key = key;
+        QuestionUpdater runnable = new QuestionUpdater(event,answer, this, time, key);
+        this.t = new Thread(runnable);
+        runnable.giveT(t);
+        this.t.start();
+    }
+    
     public void startQuestionUpdates(MessageEvent event,Answer answer, Question question, int time){
         this.runnable = new QuestionUpdater(event,answer, this, time);
         this.t = new Thread(runnable);
