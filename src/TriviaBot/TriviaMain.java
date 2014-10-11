@@ -10,15 +10,13 @@ import Objects.Answer;
 import Objects.Question;
 import Objects.Score;
 import Objects.Score.ScoreArray;
-import Objects.TimedWaitForQueue;
 import Objects.Vote;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 import Objects.Vote.VoteLog;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.Iterator;
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
@@ -45,6 +43,7 @@ public class TriviaMain extends ListenerAdapter{
     ScoreArray scores = new ScoreArray();
     String filename = "scores.json";
     boolean loaded = startScores();
+    ArrayList<Integer> levels = scoreLevels();
     
     @Override
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
@@ -78,6 +77,7 @@ public class TriviaMain extends ListenerAdapter{
         if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())){
             runTrivia = false;
             startVotes.clear();
+            int cluesGiven = 0;
             String triviaChan = event.getChannel().getName();
             Question triviaQuestion = new Question();
             Answer triviaAnswer = new Answer(triviaQuestion.getAnswer());
@@ -109,7 +109,7 @@ public class TriviaMain extends ListenerAdapter{
                     }
                     else{
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
-                        
+                        cluesGiven = 0;
                         triviaQuestion.endQuestionUpdates();
                         triviaQuestion = new Question();
                         
@@ -122,7 +122,12 @@ public class TriviaMain extends ListenerAdapter{
                 else if (currentChan.equalsIgnoreCase(triviaChan)&&!currentEvent.getUser().getNick().equalsIgnoreCase(event.getBot().getNick())){
                     if (currentMessage.equalsIgnoreCase(triviaQuestion.getAnswer())){
                         event.getBot().sendIRC().message(triviaChan,currentEvent.getUser().getNick()+" GOT IT!");
+                        if (levels.size()<cluesGiven){
+                            scores.addScore(currentEvent.getUser().getNick(), levels.get(cluesGiven));
+                            event.getBot().sendIRC().message(triviaChan,levels.get(cluesGiven)+" points have been added to your score");
+                        }
                         
+                        cluesGiven = 0;
                         triviaQuestion.endQuestionUpdates();
                         triviaQuestion = new Question();
                         
@@ -134,12 +139,24 @@ public class TriviaMain extends ListenerAdapter{
                     questionsTillEnd = numQuestionsAllowedTillEnd;
                     System.out.println("questions till end reset");
                 }
-                if (currentChan.equalsIgnoreCase(triviaChan)&&currentEvent.getUser().getNick().equalsIgnoreCase(event.getBot().getNick())) //if(currentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
+                if (currentChan.equalsIgnoreCase(triviaChan)&&currentEvent.getUser().getNick().equalsIgnoreCase(event.getBot().getNick())){ //if(currentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
                     questionsTillEnd--;
+                    cluesGiven++;
+                }
             }
         }
     }
-    public boolean startScores(){
+    private ArrayList<Integer> scoreLevels(){
+        ArrayList<Integer> levels = new ArrayList<>();
+        levels.add(5);
+        levels.add(3);
+        levels.add(2);
+        levels.add(1);
+        return levels;
+    }
+    
+    
+    private boolean startScores(){
         boolean loaded;
         try{
             scores.setFilename(filename);
@@ -175,6 +192,6 @@ public class TriviaMain extends ListenerAdapter{
             }
         }
         if (modified)
-                scores.saveToJSON();
+            scores.saveToJSON();
     }
 }
