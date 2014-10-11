@@ -16,16 +16,44 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import org.pircbotx.User;
 
 /**
  *
  * @author Stephen
+ * Object:
+ *      Score
+ * - Object that contains an int score for the input user, and keeps track of it
+ * - Object can be completely controlled through the score array
  *
+ * Methods:
+ *     *setScore - Sets the score as the input integer
+ *     *add      - Adds the input integer onto the current score
+ *     *subtract - Subtracts the current integer from the current score
+ *     *getScore - Gets the current score integer from the object
+ *     *toString - Produces an easy to read string from the score and user
+ * 
+ * Object:
+ *      ScoreArray
+ * - Contains scores of users, and allows for easy management of said scores, as well
+ *   as easy save/load from JSON
+ *
+ * Methods:
+ *     *setBaseScore  - Sets the base score that all new users start with
+ *     *setFilename   - Sets the filename to load and save to
+ *     *addScore      - Adds the input integer onto the current score of the input user
+ *     *subtractScore - Subtracts the current integer from the current score of the input user
+ *     *setScore      - Sets the current score of the input nick to the input int
+ *     *removeDupes   - Removes duplicate entries from the score object
+ *     *getScore      - gets the current score of the input user
+ *     *getScoreObj   - Gets the current score object of the input user
+ *     *containsUser  - Returns false if the input user is not in the score array
+ *     *saveToJSON    - Saves the current score array to JSON
+ *     *loadFromJSON  - Loads the score array values from JSON
+ * 
+ * Note: Only commands marked with a * are available for use outside the object
  */
 public class Score {
     private String user;
@@ -52,14 +80,14 @@ public class Score {
     public int getScore(){
         return this.score;
     }
-    public JSONObject getJSON(){
-        JSONObject score = new JSONObject();
-        score.put(user,score);
-//        score.put("score",score);
-        String jsonText = JSONValue.toJSONString(score);
-        System.out.print(jsonText);
-        return(score);
-    }
+//    public JSONObject getJSON(){
+//        JSONObject score = new JSONObject();
+//        score.put(user,score);
+////        score.put("score",score);
+//        String jsonText = JSONValue.toJSONString(score);
+//        System.out.print(jsonText);
+//        return(score);
+//    }
     public String toString(){
         return(this.user+": "+this.score);
     }
@@ -76,6 +104,19 @@ public class Score {
         public void setFilename(String filename){
             this.filename = filename;
         }
+        public void addScore(String nick, int toAdd){
+            getScoreObj(nick).add(toAdd);
+            this.saveToJSON();
+        }
+        public void subtractScore(String nick, int toSubtract){
+            getScoreObj(nick).subtract(toSubtract);
+            this.saveToJSON();
+        }
+        public void setScore(String nick, int score){
+            getScoreObj(nick).setScore(score);
+            this.saveToJSON();
+        }
+        
         public boolean containsUser(String nick){
             for(int i = 0; i < this.size(); i++) {
                 if (this.get(i).user.equalsIgnoreCase(nick)) {
@@ -85,7 +126,14 @@ public class Score {
             return false;
         }
         
-        
+        public Score getScoreObj(String nick){
+            for(int i = 0; i < this.size(); i++) {
+                if (this.get(i).user.equalsIgnoreCase(nick)) {
+                    return (this.get(i));
+                }
+            }
+            return (null);
+        }
         public int getScore(String nick){
             int idx = -1;
             for(int i = 0; i < this.size(); i++) {
