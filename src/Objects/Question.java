@@ -47,18 +47,18 @@ public class Question {
     }
     public Question(MessageEvent event,Answer answer, Question question, int time ){
         getNewQuestion();
-        QuestionUpdater runnable = new QuestionUpdater(event,answer, this, time);
-        this.t = new Thread(runnable);
-        runnable.giveT(t);
+        this.runnable = new QuestionUpdater(event,answer, this, time);
+        this.t = new Thread(this.runnable);
+        this.runnable.giveT(t);
         this.t.start();
     }
     
     public Question(MessageEvent event,Answer answer, Question question, int time, int key ){
         getNewQuestion();
         this.key = key;
-        QuestionUpdater runnable = new QuestionUpdater(event,answer, this, time, key);
-        this.t = new Thread(runnable);
-        runnable.giveT(t);
+        this.runnable = new QuestionUpdater(event,answer, this, time, key);
+        this.t = new Thread(this.runnable);
+        this.runnable.giveT(t);
         this.t.start();
     }
     
@@ -90,7 +90,9 @@ public class Question {
     public String getQuestion(){
         return this.question;
     }
-    
+    public int getClueCount(){
+        return this.runnable.getCount();
+    }
     private String loadRandomQuestionFromFile(){
         ArrayList<File> fileList = getQuestionFileList();
         File randomFile = fileList.get((int) (Math.random()*fileList.size()-1));

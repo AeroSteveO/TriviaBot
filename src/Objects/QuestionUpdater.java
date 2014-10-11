@@ -27,15 +27,16 @@ import org.pircbotx.hooks.events.MessageEvent;
  * Note: Only commands marked with a * are available for use outside the object
  */
 public class QuestionUpdater implements Runnable{
-    private PircBotX bot;
-    private Thread t;
+    private PircBotX bot; // Bot object to use to send out updates to IRC
+    private Thread t;     // Thread for the updater to do its thing in
     private boolean running = true;
-    private String channel = null;
+    private String channel = null;  // Channel to send updates to
     private Answer answer;
     private Question question;
-    private int time;
-    private int key = 0;
+    private int time;     // Amount of time between question updates
+    private int key = 0;  // Key to send out to stop the current message queue
     private MessageEvent event;
+    private int counter;  // Number of clues given by the question updater
     
     QuestionUpdater(MessageEvent event, Answer answer, Question question, int time){
         this.bot = event.getBot();
@@ -56,6 +57,11 @@ public class QuestionUpdater implements Runnable{
         this.key = key;
         this.event = event;
     }
+    
+    public int getCount(){
+        return this.counter;
+    }
+    
     public void giveT(Thread t) {
         this.t = t;
     }
@@ -70,7 +76,7 @@ public class QuestionUpdater implements Runnable{
     public void run() {
         this.running = true;
         this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.getClue());
-        int counter = 1;
+        this.counter = 1;
         try{
             Thread.sleep(this.time*1000);
         }
@@ -79,18 +85,22 @@ public class QuestionUpdater implements Runnable{
             System.out.println(ex.getMessage());
         }
         System.out.println(this.running);
-        while (this.running&&counter<4){
+        while (this.running&&this.counter<4){
             System.out.println("Bing an update");
+            System.out.println(this.counter+" is the count");
             try {
+//                if (!this.running)
+//                    return;
+                
                 this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.giveClue());
                 Thread.sleep(this.time*1000);
-                counter++; // just to make sure the queue stops before giving out more hints than it should
-            } catch (InterruptedException ex) {
+                this.counter++; // just to make sure the queue stops before giving out more hints than it should
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 System.out.println(ex.getMessage());
             }
         }
-        if (key != 0){
+        if (key != 0 && this.running){
             bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(key)));
             System.out.println("PING PONG");
         }
