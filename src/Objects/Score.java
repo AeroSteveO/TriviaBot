@@ -64,7 +64,7 @@ import org.json.simple.parser.JSONParser;
  *
  * Note: Only commands marked with a * are available for use outside the object
  */
-public class Score {
+public class Score implements Comparable<Score> {
     private String user;
     private int score;
     
@@ -91,6 +91,10 @@ public class Score {
         this.score = this.score - intToSubtract;
     }
     
+    public String getUser(){
+        return this.user;
+    }
+    
     public int getScore(){
         return this.score;
     }
@@ -102,10 +106,23 @@ public class Score {
 //        System.out.print(jsonText);
 //        return(score);
 //    }
+    @Override
     public String toString(){
         return(this.user+": "+this.score);
     }
     
+    @Override
+    public int compareTo(Score compareScore) {
+        
+        int compareQuantity = ((Score) compareScore).getScore();
+        
+        //ascending order
+        //return this.score - compareQuantity;
+        
+        //descending order
+        return compareQuantity - this.score;
+        
+    }
     
     public static class ScoreArray extends Vector<Score>{
         private String filename="doNotSave";

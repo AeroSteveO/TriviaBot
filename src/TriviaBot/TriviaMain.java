@@ -1,8 +1,8 @@
- /**
-  * To change this license header, choose License Headers in Project Properties.
-  * To change this template file, choose Tools | Templates
-  * and open the template in the editor.
-  */
+/**
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
 package TriviaBot;
 
@@ -16,6 +16,7 @@ import org.pircbotx.hooks.events.MessageEvent;
 import Objects.Vote.VoteLog;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
@@ -108,6 +109,20 @@ public class TriviaMain extends ListenerAdapter{
                 scores.removeDupes();
                 scores.saveToJSON();
             }
+            // List out the overall standings of the trivia channel
+            else if (command.equalsIgnoreCase("standings")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+                int i=0;
+                Collections.sort(scores);
+                for(Score temp: scores){
+                    // If a score is zero, ignore it
+                    if (temp.getScore()>0)
+                        event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                }
+                // If nobody has a score, say that instead of saying nothing at all
+                if (i==0){
+                    event.getBot().sendIRC().message(event.getChannel().getName(), "Nobody's score is greater than zero at this moment");
+                }
+            }
         }
         
         if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())){
@@ -189,6 +204,20 @@ public class TriviaMain extends ListenerAdapter{
                             }
                             else
                                 event.getBot().sendIRC().message(triviaChan,user+"'s current score is "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and their overall score is "+Colors.BOLD+Colors.RED+globalScore);
+                        }
+                        // Get the current game's standings
+                        else if (command.equalsIgnoreCase("standings")){
+                            int i=0;
+                            Collections.sort(currentGame);
+                            for(Score temp: currentGame){
+                                // If a score is zero, ignore it
+                                if (temp.getScore()>0)
+                                    event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                            }
+                            // If nobody has a score greater than zero, say so
+                            if (i==0){
+                                event.getBot().sendIRC().message(event.getChannel().getName(), "Nobody's score is greater than zero at this moment");
+                            }
                         }
                     }
                     if (currentMessage.equalsIgnoreCase(triviaQuestion.getAnswer())){
