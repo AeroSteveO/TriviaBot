@@ -34,7 +34,7 @@ import org.json.simple.parser.JSONParser;
  *     *subtract - Subtracts the current integer from the current score
  *     *getScore - Gets the current score integer from the object
  *     *toString - Produces an easy to read string from the score and user
- * 
+ *
  * Object:
  *      ScoreArray
  * - Contains scores of users, and allows for easy management of said scores, as well
@@ -43,16 +43,25 @@ import org.json.simple.parser.JSONParser;
  * Methods:
  *     *setBaseScore  - Sets the base score that all new users start with
  *     *setFilename   - Sets the filename to load and save to
+ *                      If no filename is input, the object will not save the scores
  *     *addScore      - Adds the input integer onto the current score of the input user
  *     *subtractScore - Subtracts the current integer from the current score of the input user
  *     *setScore      - Sets the current score of the input nick to the input int
  *     *removeDupes   - Removes duplicate entries from the score object
- *     *getScore      - gets the current score of the input user
+ *     *getScore      - Gets the current score of the input user
+ *                    - Returns -1 if no user/score is found
  *     *getScoreObj   - Gets the current score object of the input user
+ *                      If no object is found, it creates a new score object and
+ *                      returns that
  *     *containsUser  - Returns false if the input user is not in the score array
  *     *saveToJSON    - Saves the current score array to JSON
  *     *loadFromJSON  - Loads the score array values from JSON
- * 
+ *     *copyOutZeros  - Returns a score array of all the same users, but with
+ *                      all zero for their scores
+ *     *merge         - Merges one score array into the other, adding scores from one
+ *                      to the current scores of the second, if there is no current
+ *                      score in the second for a user, it adds that user and their score
+ *
  * Note: Only commands marked with a * are available for use outside the object
  */
 public class Score {
@@ -64,19 +73,24 @@ public class Score {
         this.user = user;
         this.score = 0;
     }
+    
     public Score(String user, int baseScore){
         this.user = user;
         this.score = baseScore;
     }
+    
     public void setScore(int score){
         this.score = score;
     }
+    
     public void add(int intToAdd){
         this.score=this.score+intToAdd;
     }
+    
     public void subtract (int intToSubtract){
         this.score = this.score - intToSubtract;
     }
+    
     public int getScore(){
         return this.score;
     }
@@ -92,9 +106,9 @@ public class Score {
         return(this.user+": "+this.score);
     }
     
-
+    
     public static class ScoreArray extends Vector<Score>{
-        private String filename;
+        private String filename="doNotSave";
         private int baseScore=0;
         
         public void setBaseScore(int score){
@@ -104,17 +118,34 @@ public class Score {
         public void setFilename(String filename){
             this.filename = filename;
         }
+        
         public void addScore(String nick, int toAdd){
             getScoreObj(nick).add(toAdd);
             this.saveToJSON();
         }
+        
         public void subtractScore(String nick, int toSubtract){
             getScoreObj(nick).subtract(toSubtract);
             this.saveToJSON();
         }
+        
         public void setScore(String nick, int score){
             getScoreObj(nick).setScore(score);
             this.saveToJSON();
+        }
+        
+        public ScoreArray copyOutZeros(){
+            ScoreArray zeros = new ScoreArray();
+            for (int i=0;i<this.size();i++){
+                zeros.add(new Score(this.get(i).user));
+            }
+            return zeros;
+        }
+        
+        public void merge(ScoreArray toBeMerged){
+            for (int i=0;i<toBeMerged.size();i++){
+                this.addScore(toBeMerged.get(i).user, toBeMerged.get(i).getScore());
+            }
         }
         
         public boolean containsUser(String nick){
@@ -132,21 +163,21 @@ public class Score {
                     return (this.get(i));
                 }
             }
-            return (null);
+            this.add(new Score(nick,baseScore));
+            return (this.getScoreObj(nick));
         }
+        
         public int getScore(String nick){
-            int idx = -1;
             for(int i = 0; i < this.size(); i++) {
                 if (this.get(i).user.equalsIgnoreCase(nick)) {
-                    idx = i;
-                    break;
+                    return (this.get(i).score);
                 }
             }
-            if (idx==-1){
-                this.add(new Score(nick,baseScore));
-                idx = this.size();
-            }
-            return (this.get(idx).score);
+//            if (idx==-1){
+//                this.add(new Score(nick,baseScore));
+//                idx = this.size();
+//            }
+            return (-1);
         }
         
         public void removeDupes(){
@@ -163,32 +194,35 @@ public class Score {
         }
         
         public boolean saveToJSON(){
-            JSONObject scoreList = new JSONObject();
+            if (!this.filename.equalsIgnoreCase("doNotSave")){
+                JSONObject scoreList = new JSONObject();
 //            JSONArray score = new JSONArray();
-            for (int i=0;i<this.size();i++){
-                scoreList.put(this.get(i).user,this.get(i).score);
-            }
-            String addition = JSONValue.toJSONString(scoreList);
-            try{
-                File file =new File(filename);
-                
-                //if file doesnt exists, then create it
+                for (int i=0;i<this.size();i++){
+                    scoreList.put(this.get(i).user,this.get(i).score);
+                }
+                String addition = JSONValue.toJSONString(scoreList);
+                try{
+                    File file =new File(filename);
+                    
+                    //if file doesnt exists, then create it
 //                if(!file.exists()){
                     file.createNewFile();
 //                }
-                
-                //true = append file
-                FileWriter fileWritter = new FileWriter(file.getName());
-                BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-                bufferWritter.write(addition);
-                bufferWritter.close();
-                
-            }catch(IOException e){
-                System.out.println(filename+" HAS NOT BEEN SAVED");
-                e.printStackTrace();
-                return false;
+                    
+                    //true = append file
+                    FileWriter fileWritter = new FileWriter(file.getName());
+                    BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+                    bufferWritter.write(addition);
+                    bufferWritter.close();
+                    
+                }catch(IOException e){
+                    System.out.println(filename+" HAS NOT BEEN SAVED");
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
             }
-            return true;
+            return false;
         }
         
         public boolean loadFromJSON() throws IOException{
@@ -220,6 +254,7 @@ public class Score {
             }
             return true;
         }
+        
         public String loadText() throws FileNotFoundException, IOException{
             File file =new File(filename);
             //if file doesnt exists, then create it
