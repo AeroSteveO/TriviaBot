@@ -4,8 +4,9 @@
 * -> Additional functionality and robustness being added in including:
 *    - Rejoin server on network failure
 *    - Rejoin channel on kick
-*    - Fixing issue with ?standings command
+*    - Fixing issue with !standings command
 *    - Ability to easily change the prefix to commands
+*    - Current trivia game scores as well as overall scores
 *    - TRIVIA WARS
 *
 * This program is free software: you can redistribute it and/or modify

@@ -48,6 +48,7 @@ public class QuestionUpdater implements Runnable{
         this.time = time; // Seconds
         this.event = event;
     }
+    
     QuestionUpdater(MessageEvent event, Answer answer, Question question, int time, int key){
         this.bot = event.getBot();
         this.channel = event.getChannel().getName();
@@ -66,18 +67,22 @@ public class QuestionUpdater implements Runnable{
     public void giveT(Thread t) {
         this.t = t;
     }
+    
     public void end() throws InterruptedException{
         this.running = false;
         t.join(1000); //Ensure the thread also closes
     }
+    
 //    public void setRunningTrue(){
 //        this.running = true;
 //    }
+    
     @Override
     public void run() {
         this.running = true;
         this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.getClue());
         this.counter = 1;
+        
         try{
             Thread.sleep(this.time*1000);
         }
@@ -85,7 +90,9 @@ public class QuestionUpdater implements Runnable{
             ex.printStackTrace();
             System.out.println(ex.getMessage());
         }
+        
         System.out.println(this.running);
+        
         while (this.running&&this.counter<4){
 //            System.out.println("Bing an update");
 //            System.out.println(this.counter+" is the count");
@@ -99,6 +106,7 @@ public class QuestionUpdater implements Runnable{
                 System.out.println(ex.getMessage());
             }
         }
+        
         if (key != 0 && this.running){
             bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(key)));
 //            System.out.println("PING PONG");

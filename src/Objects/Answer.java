@@ -29,6 +29,7 @@ public class Answer {
         this.answer=inputAnswer;
         this.maskedAnswer=mask(this.answer);
     }
+    
     private static String mask(String input){
         String blanks = new String();
         for (int i = 0; i<input.length(); i++){
@@ -44,15 +45,18 @@ public class Answer {
         }
         return(blanks);
     }
+    
     public String giveClue(){
 //        int charLocation = (int) (Math.random()*this.answer.length()-1);
         boolean charChange = false;
         int numCharsLeft = 0;
+        
         for (int i=0;i<this.maskedAnswer.length();i++){
             if (this.maskedAnswer.charAt(i)=='*'){
                 numCharsLeft++;
             }
         }
+        
         if (numCharsLeft>1){
 //            int charLocation = (int) (Math.random()*numCharsLeft-1);
             int i=(int) (Math.random()*numCharsLeft-1)-1;
@@ -69,6 +73,7 @@ public class Answer {
                 i++;
             }
         }
+        
         else{
             for (int i=0;i<this.maskedAnswer.length();i++){
                 if (this.maskedAnswer.charAt(i)=='*'){
@@ -102,13 +107,16 @@ public class Answer {
 //        }
         return this.maskedAnswer;
     }
+    
     public String getClue(){
         return this.maskedAnswer;
     }
+    
     public void setAnswer(String newAnswer){
         this.answer=newAnswer;
         this.maskedAnswer=mask(this.answer);
     }
+    
     public String reveal(){
         return(this.answer);
     }

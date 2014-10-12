@@ -16,6 +16,7 @@ import java.util.Vector;
  *      TriviaGames
  * - Contains channels that the bot is in and whether they have active games of
  *   trivia or not
+ * - Completely controlled through the TriviaArray object
  * Methods:
  *      isActive   - Returns true if the channel is currently active, false if not
  *      activate   - Sets the channel to active state of trivia
@@ -41,15 +42,19 @@ public class TriviaGames {
         this.channel = chan;
         this.active = active;
     }
+    
     private void activate(){
         this.active = true;
     }
+    
     private void deactivate(){
         this.active = false;
     }
+    
     private boolean isActive(){
         return active;
     }
+    
     private String getChannel(){
         return this.channel;
     }
@@ -69,6 +74,7 @@ public class TriviaGames {
             this.add(new TriviaGames(inputChannel, false));
             return(false);
         }
+        
         public int getGameIdx(String channel){
             int idx = -1;
             for(int i = 0; i < this.size(); i++) {
@@ -79,15 +85,19 @@ public class TriviaGames {
             }
             return (idx);
         }
+        
         public TriviaGames getGame(String channel){
             return (this.get(this.getGameIdx(channel)));
         }
+        
         public void activate(String channel){
             this.get(this.getGameIdx(channel)).activate();
         }
+        
         public void deactivate(String channel){
             this.get(this.getGameIdx(channel)).deactivate();
         }
+        
         public void clearInactive(){
             for(int i = 0; i < this.size(); i++) {
                 if (!this.get(i).isActive()) {

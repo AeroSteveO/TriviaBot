@@ -46,11 +46,13 @@ public class Vote {
         this.expiration = new DateTime().plusMinutes(10);
         this.voter = nick;
     }
+    
     public Vote(String nick, String channel){
         this.expiration = new DateTime().plusMinutes(10);
         this.voter = nick;
         this.channel = channel;
     }
+    
     private boolean isAfterExpiration(){
         if (new DateTime().isAfter(expiration)){
             return(true);
@@ -67,6 +69,7 @@ public class Vote {
             this.purge();
             return (this.size()>=numVotesToRun);
         }
+        
         private boolean containsVote(String toCheck){
             for(int i = 0; i < this.size(); i++) {
                 if (this.get(i).voter.equalsIgnoreCase(toCheck)) {
@@ -75,12 +78,14 @@ public class Vote {
             }
             return (false);
         }
+        
         public void addVote(String nick){
             this.purge();
             if (!containsVote(nick)){
                 this.add(new Vote(nick));
             }
         }
+        
         private void purge(){
             for (int i=0;i<this.size();i++){
                 if(this.get(i).isAfterExpiration()){
@@ -89,6 +94,7 @@ public class Vote {
                 }
             }
         }
+        
         public boolean start(String chan){
             this.purge();
             int count = 0;
@@ -99,6 +105,7 @@ public class Vote {
             }
             return (count>=numVotesToRun);
         }
+        
         private boolean containsVote(String nick,String chan){
             for(int i = 0; i < this.size(); i++) {
                 if (this.get(i).voter.equalsIgnoreCase(nick)&&this.get(i).getChan().equalsIgnoreCase(chan)) {
@@ -107,6 +114,7 @@ public class Vote {
             }
             return (false);
         }
+        
         public void addVote(String nick, String chan){
             this.purge();
             if (!containsVote(nick)){

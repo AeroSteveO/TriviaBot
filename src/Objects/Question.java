@@ -45,6 +45,7 @@ public class Question {
     public Question(){
         getNewQuestion();
     }
+    
     public Question(MessageEvent event,Answer answer, Question question, int time ){
         getNewQuestion();
         this.runnable = new QuestionUpdater(event,answer, this, time);
@@ -68,6 +69,7 @@ public class Question {
         this.runnable.giveT(t);
         this.t.start();
     }
+    
     public void startQuestionUpdates(MessageEvent event,Answer answer, Question question, int time, int key){
         this.key = key;
         this.runnable = new QuestionUpdater(event,answer, this, time, this.key);
@@ -75,24 +77,30 @@ public class Question {
         this.runnable.giveT(t);
         this.t.start();
     }
+    
     public void endQuestionUpdates() throws InterruptedException{
         this.runnable.end();
         this.t.join();
     }
+    
     public void getNewQuestion(){
         String[] tmp = loadRandomQuestionFromFile().split("`");
         this.answer=tmp[1];
         this.question = tmp[0];
     }
+    
     public String getAnswer(){
         return this.answer;
     }
+    
     public String getQuestion(){
         return this.question;
     }
+    
     public int getClueCount(){
         return this.runnable.getCount();
     }
+    
     private String loadRandomQuestionFromFile(){
         ArrayList<File> fileList = getQuestionFileList();
         File randomFile = fileList.get((int) (Math.random()*fileList.size()-1));
@@ -100,6 +108,7 @@ public class Question {
         String randomQuestion = questions.get((int) (Math.random()*questions.size()-1));
         return randomQuestion;
     }
+    
     private ArrayList<File> getQuestionFileList(){
         File folder = new File("questions/");
         File[] listOfFilesAndFolders = folder.listFiles();
@@ -113,6 +122,7 @@ public class Question {
         }
         return listOfFiles;
     }
+    
     private ArrayList<String> loadQuestionFile(File file) {
         try{
             Scanner wordfile = new Scanner(file);

@@ -6,10 +6,6 @@
 
 package Objects;
 
-import TriviaBot.Global;
-import org.pircbotx.Channel;
-import org.pircbotx.PircBotX;
-import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -21,6 +17,7 @@ public  class TimedWaitForQueue extends WaitForQueue{
     int time;
     private QueueTime runnable = null;
     Thread t;
+    
 //OLD CONSTRUCTOR IS OLD
 //    public TimedWaitForQueue(PircBotX bot,int time, Channel chan,User user, int key) throws InterruptedException {
 //        super(bot);
@@ -30,6 +27,7 @@ public  class TimedWaitForQueue extends WaitForQueue{
 //        runnable.giveT(t);
 //        t.start();
 //    }
+    
     public TimedWaitForQueue(MessageEvent event, int time, int key) throws InterruptedException {
         super(event.getBot());
         this.time=time;
@@ -38,6 +36,7 @@ public  class TimedWaitForQueue extends WaitForQueue{
         runnable.giveT(this.t);
         this.t.start();
     }
+    
     public void end() throws InterruptedException{
         this.close(); //Close this EventQueue
         this.t.join(1000); //Ensure the thread also closes

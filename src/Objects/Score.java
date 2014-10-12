@@ -183,9 +183,11 @@ public class Score {
         public void removeDupes(){
             ArrayList<String> typesContained = new ArrayList<>();
             for(int i = 0; i < this.size(); i++) {
+                
                 if (!typesContained.contains(this.get(i).user)) {
                     typesContained.add(this.get(i).user);
                 }
+                
                 else if (typesContained.contains(this.get(i).user)){
                     this.remove(i);
                     i--;
@@ -228,6 +230,7 @@ public class Score {
         public boolean loadFromJSON() throws IOException{
             try{
                 String jsonText = loadText(); // Should only have one line of text
+                
                 if (jsonText!=null&&!jsonText.equals("")){
                     JSONParser parser = new JSONParser();
                     JSONObject scores = (JSONObject) parser.parse(jsonText);
@@ -262,6 +265,7 @@ public class Score {
                 file.createNewFile();
                 return null;
             }
+            
             try{
                 Scanner wordfile = new Scanner(new File(filename));
                 String wordls = "";
