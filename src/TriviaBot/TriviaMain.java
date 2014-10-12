@@ -10,7 +10,6 @@ import Objects.Answer;
 import Objects.Question;
 import Objects.Score;
 import Objects.Score.ScoreArray;
-import Objects.Vote;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -26,8 +25,25 @@ import org.pircbotx.hooks.events.UserListEvent;
 /**
  *
  * @author Steve-O
+ * ADMIN COMMANDS
+ * Activate Command with:
+ *      !start
+ *          Instantly starts the trivia
+ *      !stop
+ *          Instantly stops the trivia
+ *      !save
+ *          Saves everyones score to JSON and removes duplicate entries if any were made
  *
- *
+ * USER COMMANDS
+ * Activate Command with:
+ *      !start
+ *          Adds a vote to start the trivia, 3 votes are needed within 10 min to start
+ *      !stop
+ *          Adds a vote to stop the trivia, 3 votes are needed within 10min to stop
+ *      !score
+ *          Responds with your current trivia score
+ *      !score [user]
+ *          Responds with the input users current trivia score
  */
 public class TriviaMain extends ListenerAdapter{
     boolean runTrivia = false;                              // Should Trivia Be Running
@@ -37,8 +53,8 @@ public class TriviaMain extends ListenerAdapter{
     int time = 20;               // Seconds between the start of the trivia challenge and failure //160
 //    int votesTillStart = 3;       // Number of startVotes needed to start trivia
     //int key=(int) (Math.random()*100000+1);
-    VoteLog startVotes = new Vote.VoteLog();                     // Log of current Votes for starting trivia
-    VoteLog stopVotes  = new Vote.VoteLog();                     // Log of current Votes for stopping trivia
+    VoteLog startVotes = new VoteLog();                     // Log of current Votes for starting trivia
+    VoteLog stopVotes  = new VoteLog();                     // Log of current Votes for stopping trivia
     
     ScoreArray scores = new ScoreArray();
     String filename = "scores.json";
@@ -50,26 +66,46 @@ public class TriviaMain extends ListenerAdapter{
         String message = Colors.removeFormattingAndColors(event.getMessage());
         if (message.startsWith(Global.commandPrefix)){
             String command = message.split(Global.commandPrefix)[1].toLowerCase();
-            if (command.equalsIgnoreCase("start")&&Global.botAdmins.contains(event.getUser().getNick())){ // Admin start
+            // Admin start
+            if (command.equalsIgnoreCase("start")&&Global.botAdmins.contains(event.getUser().getNick())){
                 runTrivia = true;
             }
-            else if (command.equalsIgnoreCase("start")){ // user start
+            // user start
+            else if (command.equalsIgnoreCase("start")){
                 startVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
             }
-            else if (command.equalsIgnoreCase("stop")){ // user stop
+            // user stop
+            else if (command.equalsIgnoreCase("stop")){
                 stopVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
             }
-            else if (command.equalsIgnoreCase("stop")&&Global.botAdmins.contains(event.getUser().getNick())){ // Admin stop
+            // Admin stop
+            else if (command.equalsIgnoreCase("stop")&&Global.botAdmins.contains(event.getUser().getNick())){
                 runTrivia = false;
             }
-            else if (command.equalsIgnoreCase("score")){ // Get your current score
-                event.respond("Your current score is: "+scores.getScore(event.getUser().getNick()));
+            // Get your current score
+            else if (command.equalsIgnoreCase("score")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+                int globalScore = scores.getScore(event.getUser().getNick());
+                
+                if (globalScore < 0){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                }
+                else
+                    event.respond("Your overall score is: "+globalScore);
             }
-            else if (command.matches("score\\s[a-z\\|]+")){ // Get someone elses current score
+            // Get someone elses current score
+            else if (command.matches("score\\s[a-z\\|\\-]+")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
                 String user = command.split(" ")[1];
-                event.respond(user+"'s current score is: "+scores.getScore(user));
+                int globalScore = scores.getScore(user);
+                
+                if (globalScore < 0){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                }
+                else
+                    event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+globalScore);
             }
-            else if (command.equalsIgnoreCase("save")&&Global.botAdmins.contains(event.getUser().getNick())){ // Save the scores file
+            // Save the scores file
+            else if (command.equalsIgnoreCase("save")&&Global.botAdmins.contains(event.getUser().getNick())){
+                scores.removeDupes();
                 scores.saveToJSON();
             }
         }
@@ -77,18 +113,21 @@ public class TriviaMain extends ListenerAdapter{
         if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())){
             runTrivia = false;
             startVotes.clear();
-//            int cluesGiven = 0;
+            ScoreArray currentGame = scores.copyOutZeros();
+            int key=(int) (Math.random()*100000+1);
             String triviaChan = event.getChannel().getName();
+            Global.activeGames.activate(triviaChan);
             Question triviaQuestion = new Question();
             Answer triviaAnswer = new Answer(triviaQuestion.getAnswer());
             
             event.getBot().sendIRC().message(event.getChannel().getName(),"Question:");
             event.getBot().sendIRC().message(event.getChannel().getName(), triviaQuestion.getQuestion());
-            int key=(int) (Math.random()*100000+1);
+            
             WaitForQueue queue = new WaitForQueue(event.getBot());
             triviaQuestion.startQuestionUpdates(event, triviaAnswer, triviaQuestion, timeBetweenUpdates, key);
             boolean running = true;
             int questionsTillEnd = numQuestionsAllowedTillEnd;
+            
             while (running){
                 MessageEvent currentEvent = queue.waitFor(MessageEvent.class);
                 String currentMessage = Colors.removeFormattingAndColors(currentEvent.getMessage());
@@ -99,6 +138,7 @@ public class TriviaMain extends ListenerAdapter{
                     triviaQuestion.endQuestionUpdates();
                     queue.close();
                 }
+                
                 else if (currentMessage.equalsIgnoreCase(Integer.toString(key))){
                     if(questionsTillEnd==0){
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
@@ -107,9 +147,9 @@ public class TriviaMain extends ListenerAdapter{
                         triviaQuestion.endQuestionUpdates();
                         queue.close();
                     }
+                    
                     else{
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
-//                        cluesGiven = 0;
                         triviaQuestion.endQuestionUpdates();
                         triviaQuestion = new Question();
                         key=(int) (Math.random()*100000+1);
@@ -119,16 +159,46 @@ public class TriviaMain extends ListenerAdapter{
                         triviaQuestion.startQuestionUpdates(event, triviaAnswer, triviaQuestion, timeBetweenUpdates,key);
                     }
                 }
+                
                 else if (currentChan.equalsIgnoreCase(triviaChan)&&!currentEvent.getUser().getNick().equalsIgnoreCase(event.getBot().getNick())){
+                    
+                    if (currentMessage.startsWith(Global.commandPrefix)){
+                        
+                        String command = currentMessage.split(Global.commandPrefix)[1].toLowerCase();
+                        // Get your current score
+                        if (command.equalsIgnoreCase("score")){
+                            
+                            int currentScore = currentGame.getScore(event.getUser().getNick());
+                            int globalScore = scores.getScore(event.getUser().getNick());
+                            
+                            if (currentScore < 0 || globalScore < 0){
+                                event.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
+                            }
+                            else
+                                event.respond("Your current score is: "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and your overall score is: "+Colors.BOLD+Colors.RED+globalScore);
+                        }
+                        // Get someone elses current score
+                        else if (command.matches("score\\s[a-z\\|\\-]+")){
+                            
+                            String user = command.split(" ")[1];
+                            int currentScore = currentGame.getScore(user);
+                            int globalScore = scores.getScore(user);
+                            
+                            if (currentScore < 0 || globalScore < 0){
+                                event.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
+                            }
+                            else
+                                event.getBot().sendIRC().message(triviaChan,user+"'s current score is "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and their overall score is "+Colors.BOLD+Colors.RED+globalScore);
+                        }
+                    }
                     if (currentMessage.equalsIgnoreCase(triviaQuestion.getAnswer())){
                         event.getBot().sendIRC().message(triviaChan,currentEvent.getUser().getNick()+" GOT IT!");
                         int cluesGiven = triviaQuestion.getClueCount();
                         if (levels.size()>cluesGiven){
-                            scores.addScore(currentEvent.getUser().getNick(), levels.get(cluesGiven));
+                            currentGame.addScore(currentEvent.getUser().getNick(), levels.get(cluesGiven));
                             event.getBot().sendIRC().message(triviaChan,levels.get(cluesGiven)+" points have been added to your score");
                         }
                         
-//                        cluesGiven = 0;
                         triviaQuestion.endQuestionUpdates();
                         triviaQuestion = new Question();
                         key=(int) (Math.random()*100000+1);
@@ -140,11 +210,13 @@ public class TriviaMain extends ListenerAdapter{
                     questionsTillEnd = numQuestionsAllowedTillEnd;
                     System.out.println("questions till end reset");
                 }
+                
                 if (currentChan.equalsIgnoreCase(triviaChan)&&currentEvent.getUser().getNick().equalsIgnoreCase(event.getBot().getNick())){ //if(currentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
                     questionsTillEnd--; // Every time the bot sends a message with a question update, reduce the number of questions till the game auto-ends
-//                    cluesGiven++;// Wrong
                 }
             }
+            scores.merge(currentGame);
+            Global.activeGames.deactivate(triviaChan);
         }
     }
     private ArrayList<Integer> scoreLevels(){
@@ -155,7 +227,6 @@ public class TriviaMain extends ListenerAdapter{
         levels.add(1);
         return levels;
     }
-    
     
     private boolean startScores(){
         boolean loaded;
@@ -170,14 +241,16 @@ public class TriviaMain extends ListenerAdapter{
         }
         return true;
     }
-    @Override
+    
+    @Override // Grabs users who join the channel and adds them to the score list
     public void onJoin(JoinEvent event){
         if (!scores.containsUser(event.getUser().getNick())){
             scores.add(new Score(event.getUser().getNick()));
             scores.saveToJSON();
         }
     }
-    @Override
+    
+    @Override // Grabs the user list and adds them to the score list
     public void onUserList(UserListEvent event){
         ImmutableSortedSet users = event.getUsers();
         
