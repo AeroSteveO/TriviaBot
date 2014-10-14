@@ -29,10 +29,11 @@ import org.json.simple.parser.JSONParser;
  * - Object can be completely controlled through the score array
  *
  * Methods:
- *     *setScore - Sets the score as the input integer
- *     *add      - Adds the input integer onto the current score
- *     *subtract - Subtracts the current integer from the current score
+ *      setScore - Sets the score as the input integer
+ *      add      - Adds the input integer onto the current score
+ *      subtract - Subtracts the current integer from the current score
  *     *getScore - Gets the current score integer from the object
+ *     *getUser  - Returns the user string from the object
  *     *toString - Produces an easy to read string from the score and user
  *
  * Object:
@@ -61,6 +62,7 @@ import org.json.simple.parser.JSONParser;
  *     *merge         - Merges one score array into the other, adding scores from one
  *                      to the current scores of the second, if there is no current
  *                      score in the second for a user, it adds that user and their score
+ *     *compareTo     - Used to enable sorting using collections.sort
  *
  * Note: Only commands marked with a * are available for use outside the object
  */
@@ -79,15 +81,15 @@ public class Score implements Comparable<Score> {
         this.score = baseScore;
     }
     
-    public void setScore(int score){
+    private void setScore(int score){
         this.score = score;
     }
     
-    public void add(int intToAdd){
+    private void add(int intToAdd){
         this.score=this.score+intToAdd;
     }
     
-    public void subtract (int intToSubtract){
+    private void subtract (int intToSubtract){
         this.score = this.score - intToSubtract;
     }
     
@@ -114,7 +116,7 @@ public class Score implements Comparable<Score> {
     @Override
     public int compareTo(Score compareScore) {
         
-        int compareQuantity = ((Score) compareScore).getScore();
+        int compareQuantity = compareScore.getScore();
         
         //ascending order
         //return this.score - compareQuantity;
@@ -138,6 +140,12 @@ public class Score implements Comparable<Score> {
         
         public void addScore(String nick, int toAdd){
             getScoreObj(nick).add(toAdd);
+            this.saveToJSON();
+        }
+        
+        public void addScore(String nick, int v, int x1, int x2){
+            v += v - (v * x1 / x2) ;
+            getScoreObj(nick).add(v);
             this.saveToJSON();
         }
         
@@ -172,6 +180,12 @@ public class Score implements Comparable<Score> {
                 }
             }
             return false;
+        }
+        
+        public void addUser(String nick){
+            if (!containsUser(nick)){
+                this.add(new Score(nick,baseScore));
+            }
         }
         
         public Score getScoreObj(String nick){
