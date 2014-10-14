@@ -1,8 +1,8 @@
-/**
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+ /**
+  * To change this license header, choose License Headers in Project Properties.
+  * To change this template file, choose Tools | Templates
+  * and open the template in the editor.
+  */
 
 package TriviaBot;
 
@@ -42,9 +42,19 @@ import org.pircbotx.hooks.events.UserListEvent;
  *      !stop
  *          Adds a vote to stop the trivia, 3 votes are needed within 10min to stop
  *      !score
- *          Responds with your current trivia score
+ *          Responds with your score, if a game is currently running, it gives both
+ *          your current score and your overall trivia score, otherwise it just gives
+ *          your overall score
  *      !score [user]
- *          Responds with the input users current trivia score
+ *          Responds with the users score, if a game is currently running, it gives both
+ *          their current score and their overall trivia score, otherwise it just gives
+ *          their overall score
+ *      !standings
+ *          Responds with a list of the current standings (either for the
+ *          actively running game or the overall standings if no game is active)
+ *          If a user has a score of zero, they aren't listed, if nobody has a score
+ *          greater than zero, then it responds that nobody has a score greater than zero
+ *
  */
 public class TriviaMain extends ListenerAdapter{
     boolean runTrivia = false;                              // Should Trivia Be Running
@@ -71,11 +81,11 @@ public class TriviaMain extends ListenerAdapter{
             if (command.equalsIgnoreCase("start")&&Global.botAdmins.contains(event.getUser().getNick())){
                 runTrivia = true;
             }
-            // user start
+            // User start
             else if (command.equalsIgnoreCase("start")){
                 startVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
             }
-            // user stop
+            // User stop
             else if (command.equalsIgnoreCase("stop")){
                 stopVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
             }
@@ -150,6 +160,7 @@ public class TriviaMain extends ListenerAdapter{
                 if ((currentMessage.equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)&&Global.botAdmins.contains(currentEvent.getUser().getNick()))||stopVotes.start()){
                     event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!");
                     running = false;
+                    stopVotes.clear();
                     triviaQuestion.endQuestionUpdates();
                     queue.close();
                 }
@@ -159,6 +170,7 @@ public class TriviaMain extends ListenerAdapter{
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
                         event.getBot().sendIRC().message(triviaChan,"Looks like nobody is around, Thanks for playing trivia! Come again soon!");
                         running = false;
+                        stopVotes.clear();
                         triviaQuestion.endQuestionUpdates();
                         queue.close();
                     }
@@ -237,7 +249,7 @@ public class TriviaMain extends ListenerAdapter{
                         triviaQuestion.startQuestionUpdates(event, triviaAnswer, triviaQuestion, timeBetweenUpdates,key);
                     }
                     questionsTillEnd = numQuestionsAllowedTillEnd;
-                    System.out.println("questions till end reset");
+//                    System.out.println("questions till end reset");
                 }
                 
                 if (currentChan.equalsIgnoreCase(triviaChan)&&currentEvent.getUser().getNick().equalsIgnoreCase(event.getBot().getNick())){ //if(currentEvent.getMessage().equalsIgnoreCase(Integer.toString(key)))
@@ -274,7 +286,7 @@ public class TriviaMain extends ListenerAdapter{
     @Override // Grabs users who join the channel and adds them to the score list
     public void onJoin(JoinEvent event){
         if (!scores.containsUser(event.getUser().getNick())){
-            scores.add(new Score(event.getUser().getNick()));
+            scores.addUser(event.getUser().getNick());
             scores.saveToJSON();
         }
     }
@@ -289,7 +301,7 @@ public class TriviaMain extends ListenerAdapter{
             User element = iterator.next();
             if (!scores.containsUser(element.getNick())){
                 //temp = (User)users.floor(temp);
-                scores.add(new Score(element.getNick()));
+                scores.addUser(element.getNick());
                 System.out.println(element.getNick());
                 modified = true;
             }
