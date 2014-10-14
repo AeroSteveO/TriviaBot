@@ -29,18 +29,25 @@ import org.joda.time.DateTime;
  *   vote expiration and prevent duplicates
  * 
  * Methods:
- *     *start        - Returns true if there are enough votes to start the game
- *      containsVote - Returns true if the nickname already voted in this round of voting
- *     *addVote      - Adds the vote to the vote log only if the user hasn't voted yet in this round
- *      purge        - Removes all votes that are after expiration
- *
+ *     *start             - Returns true if there are enough votes to start the game
+ *      containsVote      - Returns true if the nickname already voted in this 
+ *                          round of voting
+ *     *addVote           - Adds the vote to the vote log only if the user 
+ *                          hasn't voted yet in this round
+ *      purge             - Removes all votes that are after expiration
+ *     *setNumVotesToFlip - Sets the number of votes needed to flip the boolean
+ *                          to start or stop a game or trivia, or etc, if no value
+ *                          is specified when the object is created, it defaults
+ *                          to 3
+ * 
  * Note: Only commands marked with a * are available for use outside the object
+ * 
  */
 public class Vote {
     private DateTime expiration;
     private String voter;
     private String channel;
-    private static int numVotesToRun = 3;
+//    private static int numVotesToRun = 3;
     
     public Vote(String nick){
         this.expiration = new DateTime().plusMinutes(10);
@@ -64,6 +71,11 @@ public class Vote {
     }
     
     public static class VoteLog extends ArrayList<Vote>{
+        private int numVotesToRun = 3;
+        
+        public void setNumVotesToFlip(int num){
+            this.numVotesToRun=num;
+        }
         
         public boolean start(){
             this.purge();
