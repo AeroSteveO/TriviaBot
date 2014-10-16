@@ -58,7 +58,6 @@
 package TriviaBot;
 
 import Objects.Runner;
-import Objects.Answer;
 import java.util.Random;
 import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
@@ -92,16 +91,16 @@ public class TriviaBot extends ListenerAdapter {
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: die, set <user> <score>, start, stop, save");
                 }
             }
-            else if(command.startsWith("test")){
-                String answer = message.split(" ",2)[1];
-                Answer test = new Answer(answer);
-                event.respond(test.getClue()+" for "+test.reveal());
-                event.respond(test.giveClue());
-                event.respond(test.giveClue());
-                event.respond(test.giveClue());
-                event.respond(test.giveClue());
-                event.respond(test.giveClue());
-            }
+//            else if(command.startsWith("test")){
+//                String answer = message.split(" ",2)[1];
+//                Answer test = new Answer(answer);
+//                event.respond(test.getClue()+" for "+test.reveal());
+//                event.respond(test.giveClue());
+//                event.respond(test.giveClue());
+//                event.respond(test.giveClue());
+//                event.respond(test.giveClue());
+//                event.respond(test.giveClue());
+//            }
             else if (command.equalsIgnoreCase("die")){//||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
                 if (event.getUser().getNick().equals("Steve-O")){
                     Global.reconnect = false;
