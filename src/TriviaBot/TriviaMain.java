@@ -1,8 +1,8 @@
- /**
-  * To change this license header, choose License Headers in Project Properties.
-  * To change this template file, choose Tools | Templates
-  * and open the template in the editor.
-  */
+/**
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
 package TriviaBot;
 
@@ -33,7 +33,11 @@ import org.pircbotx.hooks.events.UserListEvent;
  *      !stop
  *          Instantly stops the trivia
  *      !save
- *          Saves everyones score to JSON and removes duplicate entries if any were made
+ *          Saves everyones score to JSON and removes duplicate entries if any 
+ *          were made
+ *      !merge [user a] [user b]
+ *          Merges the score of user a into user b, and resets user a's score to
+ *          the base score used by the scoring array
  *
  * USER COMMANDS
  * Activate Command with:
@@ -93,6 +97,24 @@ public class TriviaMain extends ListenerAdapter{
             else if (command.equalsIgnoreCase("stop")&&Global.botAdmins.contains(event.getUser().getNick())){
                 runTrivia = false;
             }
+            
+            else if (command.toLowerCase().startsWith("merge")&&command.split(" ").length==3&&Global.botAdmins.contains(event.getUser().getNick())) {
+                String mergeThis = command.split(" ")[1];
+                String mergeIntoThis = command.split(" ")[2];
+                
+                if (scores.getScore(mergeThis)<0){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), mergeThis+": USER NOT FOUND");
+                }
+                else if (scores.getScore(mergeIntoThis)<0){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), mergeIntoThis+": USER NOT FOUND");
+                }
+                
+                else{
+                    scores.merge(mergeThis,mergeIntoThis);
+                    event.getBot().sendIRC().message(event.getChannel().getName(),mergeIntoThis+"'s overall score is: "+scores.getScore(mergeIntoThis));
+                }
+            }
+            
             // Get your current score
             else if (command.equalsIgnoreCase("score")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
                 int globalScore = scores.getScore(event.getUser().getNick());
@@ -104,7 +126,7 @@ public class TriviaMain extends ListenerAdapter{
                     event.respond("Your overall score is: "+globalScore);
             }
             // Get someone elses current score
-            else if (command.matches("score\\s[a-z\\|\\-]+")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+            else if (command.toLowerCase().startsWith("score")&&command.split(" ").length==2){
                 String user = command.split(" ")[1];
                 int globalScore = scores.getScore(user);
                 
@@ -199,23 +221,23 @@ public class TriviaMain extends ListenerAdapter{
                             int globalScore = scores.getScore(event.getUser().getNick());
                             
                             if (currentScore < 0 || globalScore < 0){
-                                event.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
+                                currentEvent.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
                             }
                             else
-                                event.respond("Your current score is: "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and your overall score is: "+Colors.BOLD+Colors.RED+globalScore);
+                                currentEvent.respond("Your current score is: "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and your overall score is: "+Colors.BOLD+Colors.RED+globalScore);
                         }
                         // Get someone elses current score
-                        else if (command.matches("score\\s[a-z\\|\\-]+")){
+                        else if (command.toLowerCase().startsWith("score")&&command.split(" ").length==2){
                             
                             String user = command.split(" ")[1];
                             int currentScore = currentGame.getScore(user);
                             int globalScore = scores.getScore(user);
                             
                             if (currentScore < 0 || globalScore < 0){
-                                event.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
+                                currentEvent.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
                             }
                             else
-                                event.getBot().sendIRC().message(triviaChan,user+"'s current score is "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and their overall score is "+Colors.BOLD+Colors.RED+globalScore);
+                                currentEvent.getBot().sendIRC().message(triviaChan,user+"'s current score is "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and their overall score is "+Colors.BOLD+Colors.RED+globalScore);
                         }
                         // Get the current game's standings
                         else if (command.equalsIgnoreCase("standings")){
