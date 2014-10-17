@@ -26,7 +26,7 @@ public class Answer {
     String maskedAnswer=null;
     
     public Answer(String inputAnswer){
-        this.answer=inputAnswer;
+        this.answer=inputAnswer.trim();
         this.maskedAnswer=mask(this.answer);
     }
     

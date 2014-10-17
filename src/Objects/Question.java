@@ -85,8 +85,8 @@ public class Question {
     
     public void getNewQuestion(){
         String[] tmp = loadRandomQuestionFromFile().split("`");
-        this.answer=tmp[1];
-        this.question = tmp[0];
+        this.answer=tmp[1].trim();
+        this.question = tmp[0].trim();
     }
     
     public String getAnswer(){
