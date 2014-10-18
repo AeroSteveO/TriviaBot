@@ -39,6 +39,8 @@ import org.joda.time.DateTime;
  *                          to start or stop a game or trivia, or etc, if no value
  *                          is specified when the object is created, it defaults
  *                          to 3
+ *     *getUsers          - Returns an ArrayList of all the users who are currently
+ *                          logged as having voted
  * 
  * Note: Only commands marked with a * are available for use outside the object
  * 
@@ -66,6 +68,7 @@ public class Vote {
         }
         return(false);
     }
+    
     private String getChan(){
         return this.channel;
     }
@@ -132,6 +135,12 @@ public class Vote {
             if (!containsVote(nick)){
                 this.add(new Vote(nick,chan));
             }
+        }
+        public ArrayList<String> getUsers(){
+            ArrayList<String> users = new ArrayList<>();
+            for (int i=0;i<this.size();i++)
+                users.add(this.get(i).voter);
+            return users;
         }
     }
 }
