@@ -39,7 +39,8 @@ public class BotControl extends ListenerAdapter{
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
         
-        if (message.equalsIgnoreCase(Global.mainNick+", fix yourself")&&(event.getUser().getNick().equalsIgnoreCase(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))){
+        if (message.equalsIgnoreCase(Global.mainNick+", fix yourself")
+                &&(event.getUser().getNick().equalsIgnoreCase(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))&&event.getUser().isVerified()){
             
             event.getBot().sendIRC().message("NickServ", "ghost " + Global.mainNick + " " + Global.nickPass);  //ghost is a depricated command, if it doesn't work, the next command should work
             event.getBot().sendIRC().message("NickServ", "recover " + Global.mainNick + " " + Global.nickPass);//sends both commands, NS can yell about one and do the other
@@ -53,8 +54,8 @@ public class BotControl extends ListenerAdapter{
 //            }
         }
         
-        if (message.equalsIgnoreCase(Global.mainNick+", please shutdown")||message.equalsIgnoreCase("!shutdown")||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
-            if (event.getUser().getNick().equals(Global.botOwner)){
+        if (message.equalsIgnoreCase(Global.mainNick+", please shutdown")||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {//||message.equalsIgnoreCase("!shutdown")
+            if (event.getUser().getNick().equals(Global.botOwner)&&event.getUser().isVerified()){
                 Global.reconnect = false;
                 event.getBot().sendIRC().message(event.getChannel().getName(), "I am the weakest link, goodbye");
                 event.getBot().sendIRC().quitServer("This is triviabot, signing off.");
@@ -65,7 +66,8 @@ public class BotControl extends ListenerAdapter{
         }
         
         // command the bot to join channels
-        if ((message.toLowerCase().startsWith(Global.mainNick.toLowerCase()+", join ")||message.toLowerCase().startsWith(Global.mainNick.toLowerCase()+", please join "))&&(event.getUser().getNick().equals(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))){ //message.toLowerCase().startsWith("!join ")
+        if ((message.toLowerCase().startsWith(Global.mainNick.toLowerCase()+", join ")||message.toLowerCase().startsWith(Global.mainNick.toLowerCase()+", please join "))
+                &&(event.getUser().getNick().equals(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))&&event.getUser().isVerified()){ //message.toLowerCase().startsWith("!join ")
             String[] chan = message.split("#");
             if (message.toLowerCase().contains("#")){
                 event.getBot().sendIRC().message(event.getChannel().getName(),"Joining #" + chan[1]);
@@ -78,7 +80,7 @@ public class BotControl extends ListenerAdapter{
         
         // command the bot to part a different channel from where you are
         if ((message.toLowerCase().startsWith(Global.mainNick.toLowerCase()+", leave")||message.toLowerCase().startsWith(Global.mainNick.toLowerCase()+", please leave"))){//message.toLowerCase().startsWith("!part")
-            if (message.toLowerCase().contains("#")&&(event.getUser().getNick().equals(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))) {
+            if (message.toLowerCase().contains("#")&&((event.getUser().getNick().equals(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))&&event.getUser().isVerified())) {
                 String[] chan = message.split("#");
                 Channel c = event.getBot().getUserChannelDao().getChannel("#"+chan[1]);
                 if (!event.getBot().getUserBot().getChannels().contains(c)) {
@@ -90,7 +92,7 @@ public class BotControl extends ListenerAdapter{
 //                    Global.channels.remove(Global.channels.getChanIdx("#"+chan[1]));
                 }
             } // command the bot to part the current channel that the command was sent from
-            else if ((event.getChannel().isOwner(event.getUser())||event.getUser().getNick().equals(Global.botOwner))&&(message.endsWith("leave"))){//||message.equalsIgnoreCase("!part"))){
+            else if ((event.getChannel().isOwner(event.getUser())||event.getUser().getNick().equals(Global.botOwner))&&event.getUser().isVerified()&&(message.endsWith("leave"))){//||message.equalsIgnoreCase("!part"))){
                 
                 event.getChannel().send().part("Goodbye");
 //                Global.channels.remove(Global.channels.getChanIdx(event.getChannel().getName().toString()));
@@ -100,7 +102,8 @@ public class BotControl extends ListenerAdapter{
     @Override
     public void onPrivateMessage(PrivateMessageEvent event) throws InterruptedException{
         String message = Colors.removeFormattingAndColors(event.getMessage());
-        if (message.equalsIgnoreCase(Global.mainNick+", fix yourself")&&(event.getUser().getNick().equalsIgnoreCase(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))){
+        if (message.equalsIgnoreCase(Global.mainNick+", fix yourself")
+                &&((event.getUser().getNick().equalsIgnoreCase(Global.botOwner)||event.getUser().getNick().equalsIgnoreCase("theDoctor"))&&event.getUser().isVerified())){
             
             event.getBot().sendIRC().message("NickServ", "ghost " + Global.mainNick + " " + Global.nickPass);  //ghost is a depricated command, if it doesn't work, the next command should work
             event.getBot().sendIRC().message("NickServ", "recover " + Global.mainNick + " " + Global.nickPass);//sends both commands, NS can yell about one and do the other
