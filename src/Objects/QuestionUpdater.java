@@ -91,7 +91,7 @@ public class QuestionUpdater implements Runnable{
             System.out.println(ex.getMessage());
         }
         
-        System.out.println(this.running);
+//        System.out.println(this.running);
         
         while (this.running&&this.counter<4){
 //            System.out.println("Bing an update");
