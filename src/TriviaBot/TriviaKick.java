@@ -35,25 +35,34 @@ public class TriviaKick extends ListenerAdapter{
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
         if (message.startsWith(Global.commandPrefix)){
+            
             String command = message.split(Global.commandPrefix)[1].toLowerCase();
-            if (command.toLowerCase().startsWith("kick ")){
+            String[] cmdSplit = command.split(" ");
+            if (cmdSplit[0].equalsIgnoreCase("kick")){
+                
                 String kicker = event.getUser().getNick();
-                String kickee = command.split(" ")[1];
+                String kickee = cmdSplit[1];
+                
                 if(event.getBot().getUserChannelDao().getAllUsers().contains(event.getBot().getUserChannelDao().getUser(kickee))) {
+                    
                     String triviaChan = event.getChannel().getName();
                     Question kickQuestion = new Question();
                     Answer kickAnswer = new Answer(kickQuestion.getAnswer());
                     
                     event.getBot().sendIRC().message(event.getChannel().getName(),"Question:");
                     event.getBot().sendIRC().message(event.getChannel().getName(), kickQuestion.getQuestion());
+                    
                     int key=(int) (Math.random()*100000+1);
                     TimedWaitForQueue timedQueue = new TimedWaitForQueue(event,time,key);
                     kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates);
                     boolean running = true;
+                    
                     while (running){
                         MessageEvent CurrentEvent = timedQueue.waitFor(MessageEvent.class);
                         String currentChan = CurrentEvent.getChannel().getName();
+                        
                         if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))&&currentChan.equalsIgnoreCase(triviaChan)){
+                            
                             event.getBot().sendIRC().message(triviaChan,"Times Up! You've failed in your attempt to kick "+kickee+". ");
                             event.getBot().sendIRC().message(triviaChan,"The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
@@ -61,9 +70,10 @@ public class TriviaKick extends ListenerAdapter{
                             running = false;
                             kickQuestion.endQuestionUpdates();
                             timedQueue.end();
-                            
                         }
+                        
                         else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kickee)&&currentChan.equalsIgnoreCase(triviaChan)){
+                            
                             event.getBot().sendIRC().message(triviaChan,kickee.toUpperCase()+", YOU HAVE DEFEATED "+kicker.toUpperCase()+" AT HIS OWN GAME");
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kicker), "You are the weakest link, goodbye");
@@ -71,7 +81,9 @@ public class TriviaKick extends ListenerAdapter{
                             kickQuestion.endQuestionUpdates();
                             timedQueue.end();
                         }
+                        
                         else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kicker)&&currentChan.equalsIgnoreCase(triviaChan)){
+                            
                             event.getBot().sendIRC().message(triviaChan,kicker.toUpperCase()+", YOU HAVE SUCCEEDED!");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kickee), "You are the weakest link, goodbye");
                             running = false;
