@@ -12,8 +12,6 @@ Features
 
 Simple implementation. Questions are <string>`<string> formatted in plain text files.
 
-Configurable colored text to help differentiate game text from user text.
-
 Event driven implementation: uses very little cycles.
 
 Implementation
@@ -22,8 +20,7 @@ Implementation
 Questions exist in files under $BOTDIR/questions.
 Each round, a file is selected at random, then a line is selected at random from the file.
 
-The answer is then masked and the question is asked. Periodically, the bot will ask the current question
-again and unmask a letter. This happens three times before the answer is revealed.
+The answer is then masked and the question is asked. Periodically, the bot unmask a letter of the current question. This happens three times before the answer is revealed.
 
 What the bot doesn't do.
 ------------------------
