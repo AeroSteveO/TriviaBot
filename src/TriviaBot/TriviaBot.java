@@ -79,6 +79,9 @@ public class TriviaBot extends ListenerAdapter {
     @Override
     public void onMessage(final MessageEvent event) throws Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage().trim());
+        if (message.equalsIgnoreCase("TriviaBot?")&&!event.getBot().getUserChannelDao().getChannels(event.getBot().getUserChannelDao().getUser("Wheatley")).contains(event.getChannel())){
+            event.getBot().sendIRC().message(event.getChannel().getName(), "TriviaBot commands can be found here: http://bit.ly/1rjHlt8 | Any issues with the bot should be reported to Steve-O");
+        }
         if (message.startsWith(Global.commandPrefix)){
             String command = message.split(Global.commandPrefix)[1].toLowerCase();
             if(command.equalsIgnoreCase("source")){
