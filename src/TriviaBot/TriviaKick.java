@@ -36,7 +36,7 @@ public class TriviaKick extends ListenerAdapter{
         String message = Colors.removeFormattingAndColors(event.getMessage());
         if (message.startsWith(Global.commandPrefix)){
             
-            String command = message.split(Global.commandPrefix)[1].toLowerCase();
+            String command = message.split(Global.commandPrefix)[1];
             String[] cmdSplit = command.split(" ");
             if (cmdSplit[0].equalsIgnoreCase("kick")){
                 
