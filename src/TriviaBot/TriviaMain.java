@@ -103,7 +103,7 @@ public class TriviaMain extends ListenerAdapter{
                 runTrivia = false;
             }
             
-            else if (cmdSplit[0].equalsIgnoreCase("merge")&&cmdSplit.length==3
+            else if (cmdSplit[0].equalsIgnoreCase("combine")&&cmdSplit.length==3
                     &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()) {
                 
                 String mergeThis = cmdSplit[1];
