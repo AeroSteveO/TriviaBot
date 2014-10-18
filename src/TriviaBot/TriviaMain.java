@@ -191,6 +191,17 @@ public class TriviaMain extends ListenerAdapter{
         }
         
         if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+            
+            if (startVotes.start(event.getChannel().getName())){
+                ArrayList<String> voters = startVotes.getUsers();
+                String startMessage="";
+                for (int i=0;i<voters.size();i++){
+                    startMessage+=voters.get(i)+", ";
+                }
+                startMessage+=" your trivia game will be starting soon";
+                event.getBot().sendIRC().message(event.getChannel().getName(), startMessage);
+            }
+            
             runTrivia = false;
             startVotes.clear();
             ScoreArray currentGame = scores.copyOutZeros();
@@ -213,7 +224,7 @@ public class TriviaMain extends ListenerAdapter{
                 String currentMessage = Colors.removeFormattingAndColors(currentEvent.getMessage());
                 String currentChan = currentEvent.getChannel().getName();
                 if ((currentMessage.equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)
-                        &&Global.botAdmins.contains(currentEvent.getUser().getNick())&&event.getUser().isVerified())
+                        &&Global.botAdmins.contains(currentEvent.getUser().getNick())&&currentEvent.getUser().isVerified())
                         ||stopVotes.start()){
                     
                     event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!");
