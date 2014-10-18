@@ -80,9 +80,12 @@ public class TriviaMain extends ListenerAdapter{
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
         if (message.startsWith(Global.commandPrefix)){
-            String command = message.split(Global.commandPrefix)[1].toLowerCase();
+            String command = message.split(Global.commandPrefix)[1];//.toLowerCase()
+            String[] cmdSplit = command.split(" ");
             // Admin start
-            if (command.equalsIgnoreCase("start")&&Global.botAdmins.contains(event.getUser().getNick())){
+            if (command.equalsIgnoreCase("start")
+                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
+                
                 runTrivia = true;
             }
             // User start
@@ -94,13 +97,17 @@ public class TriviaMain extends ListenerAdapter{
                 stopVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
             }
             // Admin stop
-            else if (command.equalsIgnoreCase("stop")&&Global.botAdmins.contains(event.getUser().getNick())){
+            else if (command.equalsIgnoreCase("stop")
+                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
+                
                 runTrivia = false;
             }
             
-            else if (command.toLowerCase().startsWith("merge")&&command.split(" ").length==3&&Global.botAdmins.contains(event.getUser().getNick())) {
-                String mergeThis = command.split(" ")[1];
-                String mergeIntoThis = command.split(" ")[2];
+            else if (cmdSplit[0].equalsIgnoreCase("merge")&&cmdSplit.length==3
+                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()) {
+                
+                String mergeThis = cmdSplit[1];
+                String mergeIntoThis = cmdSplit[2];
                 
                 if (scores.getScore(mergeThis)<0){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), mergeThis+": USER NOT FOUND");
@@ -126,8 +133,8 @@ public class TriviaMain extends ListenerAdapter{
                     event.respond("Your overall score is: "+globalScore);
             }
             // Get someone elses current score
-            else if (command.toLowerCase().startsWith("score")&&command.split(" ").length==2){
-                String user = command.split(" ")[1];
+            else if (cmdSplit[0].equalsIgnoreCase("score")&&command.split(" ").length==2){
+                String user = cmdSplit[1];
                 int globalScore = scores.getScore(user);
                 
                 if (globalScore < 0){
@@ -136,8 +143,34 @@ public class TriviaMain extends ListenerAdapter{
                 else
                     event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+globalScore);
             }
+            else if (cmdSplit[0].equalsIgnoreCase("score")&&command.split(" ").length==3
+                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()) {
+                
+                String user = command.split(" ")[1];
+                String score = command.split(" ")[2];
+                int userCurrentScore = scores.getScore(user);
+                
+                if (userCurrentScore < 0){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                }
+                
+                else if (!score.matches("[0-9]+")){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(),"Input number must be an integer");
+                }
+                
+                else if(score.matches("\\-[0-9]+")){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(),"You cannot give a user a negative score");
+                }
+                
+                else{
+                    scores.setScore(user, Integer.parseInt(score));
+                    event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+scores.getScore(user));
+                }
+            }
             // Save the scores file
-            else if (command.equalsIgnoreCase("save")&&Global.botAdmins.contains(event.getUser().getNick())){
+            else if (command.equalsIgnoreCase("save")
+                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
+                
                 scores.removeDupes();
                 scores.saveToJSON();
             }
@@ -179,7 +212,10 @@ public class TriviaMain extends ListenerAdapter{
                 MessageEvent currentEvent = queue.waitFor(MessageEvent.class);
                 String currentMessage = Colors.removeFormattingAndColors(currentEvent.getMessage());
                 String currentChan = currentEvent.getChannel().getName();
-                if ((currentMessage.equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)&&Global.botAdmins.contains(currentEvent.getUser().getNick()))||stopVotes.start()){
+                if ((currentMessage.equalsIgnoreCase(Global.commandPrefix+"stop")&&currentChan.equalsIgnoreCase(triviaChan)
+                        &&Global.botAdmins.contains(currentEvent.getUser().getNick())&&event.getUser().isVerified())
+                        ||stopVotes.start()){
+                    
                     event.getBot().sendIRC().message(triviaChan,"Thanks for playing trivia!");
                     running = false;
                     stopVotes.clear();
