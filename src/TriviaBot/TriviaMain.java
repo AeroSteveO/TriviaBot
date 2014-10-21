@@ -205,7 +205,11 @@ public class TriviaMain extends ListenerAdapter{
             runTrivia = false;
             startVotes.clear();
             ScoreArray currentGame = scores.copyOutZeros();
+            
             int key=(int) (Math.random()*100000+1);
+            int updateKey = (int) (Math.random()*100000+1);
+            int counter = 0;
+            
             String triviaChan = event.getChannel().getName();
             Global.activeGames.activate(triviaChan);
             Question triviaQuestion = new Question();
@@ -213,9 +217,10 @@ public class TriviaMain extends ListenerAdapter{
             
             event.getBot().sendIRC().message(event.getChannel().getName(),"Question:");
             event.getBot().sendIRC().message(event.getChannel().getName(), triviaQuestion.getQuestion());
+            event.getBot().sendIRC().message(event.getChannel().getName(),"Clue: "+triviaAnswer.getClue());
             
             WaitForQueue queue = new WaitForQueue(event.getBot());
-            triviaQuestion.startQuestionUpdates(event, triviaAnswer, triviaQuestion, timeBetweenUpdates, key);
+            triviaQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
             boolean running = true;
             int questionsTillEnd = numQuestionsAllowedTillEnd;
             
@@ -234,6 +239,14 @@ public class TriviaMain extends ListenerAdapter{
                     queue.close();
                 }
                 
+                else if (currentMessage.equalsIgnoreCase(Integer.toString(updateKey))){
+                
+                    event.getBot().sendIRC().message(currentChan,"Clue: "+triviaAnswer.giveClue());
+                    counter++;
+                    System.out.println(counter);
+                    System.out.println(levels.get(counter));
+                }
+                
                 else if (currentMessage.equalsIgnoreCase(Integer.toString(key))){
                     if(questionsTillEnd==0){
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
@@ -246,13 +259,20 @@ public class TriviaMain extends ListenerAdapter{
                     
                     else{
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
+                        
                         triviaQuestion.endQuestionUpdates();
                         triviaQuestion = new Question();
+                        
                         key=(int) (Math.random()*100000+1);
+                        updateKey = (int) (Math.random()*100000+1);
                         triviaAnswer = new Answer(triviaQuestion.getAnswer());
+                        
                         event.getBot().sendIRC().message(triviaChan,"Next Question:");
                         event.getBot().sendIRC().message(triviaChan,triviaQuestion.getQuestion());
-                        triviaQuestion.startQuestionUpdates(event, triviaAnswer, triviaQuestion, timeBetweenUpdates,key);
+                        event.getBot().sendIRC().message(event.getChannel().getName(),"Clue: "+triviaAnswer.getClue());
+                        
+                        triviaQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
+                        counter = 0;
                     }
                 }
                 
@@ -303,19 +323,24 @@ public class TriviaMain extends ListenerAdapter{
                     }
                     if (currentMessage.equalsIgnoreCase(triviaQuestion.getAnswer())){
                         event.getBot().sendIRC().message(triviaChan,currentEvent.getUser().getNick()+" GOT IT!");
-                        int cluesGiven = triviaQuestion.getClueCount();
-                        if (levels.size()>cluesGiven){
-                            currentGame.addScore(currentEvent.getUser().getNick(), levels.get(cluesGiven));
-                            event.getBot().sendIRC().message(triviaChan,levels.get(cluesGiven)+" points have been added to your score");
+//                        int cluesGiven = triviaQuestion.getClueCount();
+                        if (levels.size()>counter){
+                            currentGame.addScore(currentEvent.getUser().getNick(), levels.get(counter));
+                            event.getBot().sendIRC().message(triviaChan,levels.get(counter)+" points have been added to your score");
                         }
                         
+                        counter = 0;
                         triviaQuestion.endQuestionUpdates();
                         triviaQuestion = new Question();
                         key=(int) (Math.random()*100000+1);
+                        updateKey = (int) (Math.random()*100000+1);
                         triviaAnswer = new Answer(triviaQuestion.getAnswer());
+                        
                         event.getBot().sendIRC().message(triviaChan,"Next Question:");
                         event.getBot().sendIRC().message(triviaChan,triviaQuestion.getQuestion());
-                        triviaQuestion.startQuestionUpdates(event, triviaAnswer, triviaQuestion, timeBetweenUpdates,key);
+                        event.getBot().sendIRC().message(event.getChannel().getName(),"Clue: "+triviaAnswer.getClue());
+                        
+                        triviaQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
                     }
                     questionsTillEnd = numQuestionsAllowedTillEnd;
 //                    System.out.println("questions till end reset");

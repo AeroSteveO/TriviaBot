@@ -33,31 +33,39 @@ public class QuestionUpdater implements Runnable{
     private boolean running = true;
     private String channel = null;  // Channel to send updates to
     private Answer answer;
-    private Question question;
     private int time;     // Amount of time between question updates
     private int key = 0;  // Key to send out to stop the current message queue
     private MessageEvent event;
     private int counter;  // Number of clues given by the question updater
+    private int updateKey = 0;
     
-    QuestionUpdater(MessageEvent event, Answer answer, Question question, int time){
+    QuestionUpdater(MessageEvent event, Answer answer, int time){
         this.bot = event.getBot();
         this.channel = event.getChannel().getName();
         this.answer = answer;
-        this.question = question;
         this.running = true;
         this.time = time; // Seconds
         this.event = event;
     }
     
-    QuestionUpdater(MessageEvent event, Answer answer, Question question, int time, int key){
+    QuestionUpdater(MessageEvent event, Answer answer, int time, int key){
         this.bot = event.getBot();
         this.channel = event.getChannel().getName();
         this.answer = answer;
-        this.question = question;
         this.running = true;
         this.time = time; // Seconds
         this.key = key;
         this.event = event;
+    }
+    
+    QuestionUpdater(MessageEvent event, int time, int endKey, int updateKey){
+        this.bot = event.getBot();
+        this.channel = event.getChannel().getName();
+        this.running = true;
+        this.time = time; // Seconds
+        this.key = endKey;
+        this.event = event;
+        this.updateKey = updateKey;
     }
     
     public int getCount(){
@@ -73,14 +81,13 @@ public class QuestionUpdater implements Runnable{
         t.join(1000); //Ensure the thread also closes
     }
     
-//    public void setRunningTrue(){
-//        this.running = true;
-//    }
-    
     @Override
     public void run() {
         this.running = true;
-        this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.getClue());
+        
+        if (this.updateKey==0)
+            this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.getClue());
+        
         this.counter = 1;
         
         try{
@@ -91,14 +98,16 @@ public class QuestionUpdater implements Runnable{
             System.out.println(ex.getMessage());
         }
         
-//        System.out.println(this.running);
-        
         while (this.running&&this.counter<4){
-//            System.out.println("Bing an update");
-//            System.out.println(this.counter+" is the count");
+            
             try {
-                if (this.running)
+                if (this.running && this.updateKey==0)
                     this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.giveClue());
+                
+                if (this.running && this.updateKey!=0){
+                    bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(updateKey)));
+                }
+                
                 Thread.sleep(this.time*1000);
                 this.counter++; // just to make sure the queue stops before giving out more hints than it should
             } catch (Exception ex) {
@@ -109,9 +118,6 @@ public class QuestionUpdater implements Runnable{
         
         if (key != 0 && this.running){
             bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(key)));
-//            System.out.println("PING PONG");
         }
-//        counter = 1;
-//        this.running = true;
     }
 }

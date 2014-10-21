@@ -53,15 +53,20 @@ public class TriviaKick extends ListenerAdapter{
                     event.getBot().sendIRC().message(event.getChannel().getName(), kickQuestion.getQuestion());
                     
                     int key=(int) (Math.random()*100000+1);
+                    int updateKey = (int) (Math.random()*100000+1);
+                    
                     TimedWaitForQueue timedQueue = new TimedWaitForQueue(event,time,key);
-                    kickQuestion.startQuestionUpdates(event, kickAnswer, kickQuestion, timeBetweenUpdates);
+                    kickQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
+                    event.getBot().sendIRC().message(event.getChannel().getName(),"Clue: "+kickAnswer.getClue());
                     boolean running = true;
                     
                     while (running){
                         MessageEvent CurrentEvent = timedQueue.waitFor(MessageEvent.class);
-                        String currentChan = CurrentEvent.getChannel().getName();
                         
-                        if (CurrentEvent.getMessage().equalsIgnoreCase(Integer.toString(key))&&currentChan.equalsIgnoreCase(triviaChan)){
+                        String currentChan = CurrentEvent.getChannel().getName();
+                        String currentMessage = Colors.removeFormattingAndColors(CurrentEvent.getMessage());
+                        
+                        if (currentMessage.equalsIgnoreCase(Integer.toString(key))&&currentChan.equalsIgnoreCase(triviaChan)){
                             
                             event.getBot().sendIRC().message(triviaChan,"Times Up! You've failed in your attempt to kick "+kickee+". ");
                             event.getBot().sendIRC().message(triviaChan,"The answer was: "+Colors.BOLD+Colors.RED+kickQuestion.getAnswer());
@@ -72,7 +77,12 @@ public class TriviaKick extends ListenerAdapter{
                             timedQueue.end();
                         }
                         
-                        else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kickee)&&currentChan.equalsIgnoreCase(triviaChan)){
+                        else if (currentMessage.equalsIgnoreCase(Integer.toString(updateKey))){
+                            
+                            event.getBot().sendIRC().message(currentChan,"Clue: "+kickAnswer.giveClue());
+                        }
+                        
+                        else if (currentMessage.equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kickee)&&currentChan.equalsIgnoreCase(triviaChan)){
                             
                             event.getBot().sendIRC().message(triviaChan,kickee.toUpperCase()+", YOU HAVE DEFEATED "+kicker.toUpperCase()+" AT HIS OWN GAME");
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
@@ -82,7 +92,7 @@ public class TriviaKick extends ListenerAdapter{
                             timedQueue.end();
                         }
                         
-                        else if (CurrentEvent.getMessage().equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kicker)&&currentChan.equalsIgnoreCase(triviaChan)){
+                        else if (currentMessage.equalsIgnoreCase(kickQuestion.getAnswer())&&CurrentEvent.getUser().getNick().equalsIgnoreCase(kicker)&&currentChan.equalsIgnoreCase(triviaChan)){
                             
                             event.getBot().sendIRC().message(triviaChan,kicker.toUpperCase()+", YOU HAVE SUCCEEDED!");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kickee), "You are the weakest link, goodbye");
