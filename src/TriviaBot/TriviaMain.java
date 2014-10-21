@@ -33,7 +33,7 @@ import org.pircbotx.hooks.events.UserListEvent;
  *      !stop
  *          Instantly stops the trivia
  *      !save
- *          Saves everyones score to JSON and removes duplicate entries if any 
+ *          Saves everyones score to JSON and removes duplicate entries if any
  *          were made
  *      !merge [user a] [user b]
  *          Merges the score of user a into user b, and resets user a's score to
@@ -64,7 +64,7 @@ public class TriviaMain extends ListenerAdapter{
     boolean runTrivia = false;                              // Should Trivia Be Running
     int numQuestionsAllowedTillEnd = 5;                     // Number of questions allowed to go without response till trivia ends
     int questionsTillAutoEnd = numQuestionsAllowedTillEnd;  // Number of questions left till trivia ends
-    int timeBetweenUpdates = 5;                            // Seconds between each clue update    //30
+    int timeBetweenUpdates = 10;                            // Seconds between each clue update    //30
     int time = 20;               // Seconds between the start of the trivia challenge and failure //160
 //    int votesTillStart = 3;       // Number of startVotes needed to start trivia
     //int key=(int) (Math.random()*100000+1);
@@ -180,12 +180,63 @@ public class TriviaMain extends ListenerAdapter{
                 Collections.sort(scores);
                 for(Score temp: scores){
                     // If a score is zero, ignore it
-                    if (temp.getScore()>0)
+                    if (temp.getScore()>0 && i<5)
                         event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
                 }
                 // If nobody has a score, say that instead of saying nothing at all
                 if (i==0){
                     event.getBot().sendIRC().message(event.getChannel().getName(), "Nobody's score is greater than zero at this moment");
+                }
+            }
+            
+            else if (cmdSplit[0].equalsIgnoreCase("standings")&&cmdSplit.length==2&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+                
+                if (cmdSplit[1].matches("[0-9]+")){
+                    int lim = Integer.parseInt(cmdSplit[1]);
+                    int i=0;
+                    Collections.sort(scores);
+                    for(Score temp: scores){
+                        // If a score is zero, ignore it
+                        if (temp.getScore()>0 && i<lim)
+                            event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                    }
+                    // If nobody has a score, say that instead of saying nothing at all
+                    if (i==0){
+                        event.getBot().sendIRC().message(event.getChannel().getName(), "Nobody's score is greater than zero at this moment");
+                    }
+                }
+                
+                else if(cmdSplit[1].matches("\\-{0,1}[0-9\\.]+")){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(),"You must input a non-negative integer");
+                    return;
+                }
+                
+                else{
+                    int globalScore = scores.getScore(cmdSplit[1]);
+                    
+                    if (globalScore < 0){
+                        event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                        return;
+                    }
+                    else{
+                        
+                        int i=0;
+//                int lim = Integer.parseInt(cmdSplit[1]);
+                        Collections.sort(scores);
+                        for(Score temp: scores){
+                            // If a score is zero, ignore it
+                            if (temp.getScore()>0){
+                                i++;
+                                if (temp.getUser().equalsIgnoreCase(cmdSplit[1])){
+                                    event.getBot().sendIRC().message(event.getChannel().getName(), i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                                }
+                            }
+                        }
+                        // If nobody has a score, say that instead of saying nothing at all
+                        if (i==0){
+                            event.getBot().sendIRC().message(event.getChannel().getName(), "Nobody's score is greater than zero at this moment");
+                        }
+                    }
                 }
             }
         }
@@ -240,7 +291,7 @@ public class TriviaMain extends ListenerAdapter{
                 }
                 
                 else if (currentMessage.equalsIgnoreCase(Integer.toString(updateKey))){
-                
+                    
                     event.getBot().sendIRC().message(currentChan,"Clue: "+triviaAnswer.giveClue());
                     counter++;
                     System.out.println(counter);
@@ -269,7 +320,7 @@ public class TriviaMain extends ListenerAdapter{
                         
                         event.getBot().sendIRC().message(triviaChan,"Next Question:");
                         event.getBot().sendIRC().message(triviaChan,triviaQuestion.getQuestion());
-                        event.getBot().sendIRC().message(event.getChannel().getName(),"Clue: "+triviaAnswer.getClue());
+                        event.getBot().sendIRC().message(triviaChan,"Clue: "+triviaAnswer.getClue());
                         
                         triviaQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
                         counter = 0;
@@ -281,11 +332,12 @@ public class TriviaMain extends ListenerAdapter{
                     if (currentMessage.startsWith(Global.commandPrefix)){
                         
                         String command = currentMessage.split(Global.commandPrefix)[1].toLowerCase();
+                        String[] cmdSplit = command.split(" ");
                         // Get your current score
                         if (command.equalsIgnoreCase("score")){
                             
-                            int currentScore = currentGame.getScore(event.getUser().getNick());
-                            int globalScore = scores.getScore(event.getUser().getNick());
+                            int currentScore = currentGame.getScore(currentEvent.getUser().getNick());
+                            int globalScore = scores.getScore(currentEvent.getUser().getNick());
                             
                             if (currentScore < 0 || globalScore < 0){
                                 currentEvent.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
@@ -313,20 +365,70 @@ public class TriviaMain extends ListenerAdapter{
                             for(Score temp: currentGame){
                                 // If a score is zero, ignore it
                                 if (temp.getScore()>0)
-                                    event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                                    currentEvent.getBot().sendIRC().message(triviaChan, ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
                             }
                             // If nobody has a score greater than zero, say so
                             if (i==0){
-                                event.getBot().sendIRC().message(event.getChannel().getName(), "Nobody's score is greater than zero at this moment");
+                                currentEvent.getBot().sendIRC().message(triviaChan, "Nobody's score is greater than zero at this moment");
+                            }
+                        }
+                        else if (cmdSplit[0].equalsIgnoreCase("standings")&&cmdSplit.length==2){
+                            
+                            if (cmdSplit[1].matches("[0-9]+")){
+                                int lim = Integer.parseInt(cmdSplit[1]);
+                                int i=0;
+                                Collections.sort(currentGame);
+                                for(Score temp: currentGame){
+                                    // If a score is zero, ignore it
+                                    if (temp.getScore()>0 && i<lim)
+                                        currentEvent.getBot().sendIRC().message(triviaChan, ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                                }
+                                // If nobody has a score, say that instead of saying nothing at all
+                                if (i==0){
+                                    currentEvent.getBot().sendIRC().message(triviaChan, "Nobody's score is greater than zero at this moment");
+                                }
+                            }
+                            
+                            else if(cmdSplit[1].matches("\\-{0,1}[0-9\\.]+")){
+                                currentEvent.getBot().sendIRC().notice(triviaChan,"You must input a non-negative integer");
+                                return;
+                            }
+                            
+                            else{
+                                int globalScore = currentGame.getScore(cmdSplit[1]);
+                                
+                                if (globalScore < 0){
+                                    currentEvent.getBot().sendIRC().notice(triviaChan, "USER NOT FOUND");
+                                    return;
+                                }
+                                else{
+                                    
+                                    int i=0;
+//                int lim = Integer.parseInt(cmdSplit[1]);
+                                    Collections.sort(currentGame);
+                                    for(Score temp: currentGame){
+                                        // If a score is zero, ignore it
+                                        if (temp.getScore()>0){
+                                            i++;
+                                            if (temp.getUser().equalsIgnoreCase(cmdSplit[1])){
+                                                currentEvent.getBot().sendIRC().message(triviaChan, i + " : " + temp.getUser() + ", Score : " + temp.getScore());
+                                            }
+                                        }
+                                    }
+                                    // If nobody has a score, say that instead of saying nothing at all
+                                    if (i==0){
+                                        currentEvent.getBot().sendIRC().message(triviaChan, "Nobody's score is greater than zero at this moment");
+                                    }
+                                }
                             }
                         }
                     }
                     if (currentMessage.equalsIgnoreCase(triviaQuestion.getAnswer())){
-                        event.getBot().sendIRC().message(triviaChan,currentEvent.getUser().getNick()+" GOT IT!");
+                        currentEvent.getBot().sendIRC().message(triviaChan,currentEvent.getUser().getNick()+" GOT IT!");
 //                        int cluesGiven = triviaQuestion.getClueCount();
                         if (levels.size()>counter){
                             currentGame.addScore(currentEvent.getUser().getNick(), levels.get(counter));
-                            event.getBot().sendIRC().message(triviaChan,levels.get(counter)+" points have been added to your score");
+                            currentEvent.getBot().sendIRC().message(triviaChan,levels.get(counter)+" points have been added to your score");
                         }
                         
                         counter = 0;
@@ -336,9 +438,9 @@ public class TriviaMain extends ListenerAdapter{
                         updateKey = (int) (Math.random()*100000+1);
                         triviaAnswer = new Answer(triviaQuestion.getAnswer());
                         
-                        event.getBot().sendIRC().message(triviaChan,"Next Question:");
-                        event.getBot().sendIRC().message(triviaChan,triviaQuestion.getQuestion());
-                        event.getBot().sendIRC().message(event.getChannel().getName(),"Clue: "+triviaAnswer.getClue());
+                        currentEvent.getBot().sendIRC().message(triviaChan,"Next Question:");
+                        currentEvent.getBot().sendIRC().message(triviaChan,triviaQuestion.getQuestion());
+                        currentEvent.getBot().sendIRC().message(triviaChan,"Clue: "+triviaAnswer.getClue());
                         
                         triviaQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
                     }
