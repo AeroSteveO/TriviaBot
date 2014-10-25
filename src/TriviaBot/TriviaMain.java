@@ -294,8 +294,6 @@ public class TriviaMain extends ListenerAdapter{
                     
                     event.getBot().sendIRC().message(currentChan,"Clue: "+triviaAnswer.giveClue());
                     counter++;
-                    System.out.println(counter);
-                    System.out.println(levels.get(counter));
                 }
                 
                 else if (currentMessage.equalsIgnoreCase(Integer.toString(key))){
