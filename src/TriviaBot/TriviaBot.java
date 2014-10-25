@@ -89,10 +89,11 @@ public class TriviaBot extends ListenerAdapter {
             }
             else if(command.equalsIgnoreCase("help")){
                 event.getBot().sendIRC().notice(event.getUser().getNick(), "Hi, I'm "+Global.botOwner+"'s trivia bot");
-                event.getBot().sendIRC().notice(event.getUser().getNick(), "Commands: score, standings, giveclue, help, next, skip, source");
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "Commands: start, stop, kick <user>, score, standings, help, source");
                 if(Global.botAdmins.contains(event.getUser().getNick())){
-                    event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: die, set <user> <score>, start, stop, save");
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: set <user> <score>, start, stop, save");
                 }
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "The full command list can be found at http://bit.ly/1rjHlt8");
             }
 //            else if(command.startsWith("test")){
 //                String answer = message.split(" ",2)[1];
