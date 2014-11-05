@@ -171,7 +171,7 @@ public class TriviaMain extends ListenerAdapter{
             else if (command.equalsIgnoreCase("save")
                     &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
                 
-                scores.removeDupes();
+                scores.clean();
                 scores.saveToJSON();
             }
             // List out the overall standings of the trivia channel

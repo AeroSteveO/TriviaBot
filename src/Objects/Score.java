@@ -23,6 +23,13 @@ import org.json.simple.parser.JSONParser;
 /**
  *
  * @author Stephen
+ * 
+ * Requirements:
+ * - APIs
+ *    JSON-Simple-1.1.1
+ * - Custom Objects
+ *    N/A
+ * 
  * Object:
  *      Score
  * - Object that contains an int score for the input user, and keeps track of it
@@ -48,7 +55,6 @@ import org.json.simple.parser.JSONParser;
  *     *addScore      - Adds the input integer onto the current score of the input user
  *     *subtractScore - Subtracts the current integer from the current score of the input user
  *     *setScore      - Sets the current score of the input nick to the input int
- *     *removeDupes   - Removes duplicate entries from the score object
  *     *getScore      - Gets the current score of the input user
  *                    - Returns -1 if no user/score is found
  *     *getScoreObj   - Gets the current score object of the input user
@@ -63,6 +69,10 @@ import org.json.simple.parser.JSONParser;
  *                      to the current scores of the second, if there is no current
  *                      score in the second for a user, it adds that user and their score
  *     *compareTo     - Used to enable sorting using collections.sort
+ *      removeDupes       - Removes duplicate entries from the score object
+ *      removeDtellaUsers - Removes users whos nick starts with '|'
+ *      removeIdlePlayers - Removes users whos score is the same as the base score
+ *     *clean             - Removes duplicates, idle players, and dtella users
  *
  * Note: Only commands marked with a * are available for use outside the object
  */
@@ -224,22 +234,48 @@ public class Score implements Comparable<Score> {
                     return (this.get(i).score);
                 }
             }
-//            if (idx==-1){
-//                this.add(new Score(nick,baseScore));
-//                idx = this.size();
-//            }
+//            throw new NullPointerException("User not contained in Score array");
             return (-1);
         }
         
-        public void removeDupes(){
-            ArrayList<String> typesContained = new ArrayList<>();
+        public void clean(){
+            this.removeDupes();
+            this.removeDtellaUsers();
+            this.removeIdlePlayers();
+            this.saveToJSON();
+        }
+        
+        private void removeIdlePlayers(){
             for(int i = 0; i < this.size(); i++) {
                 
-                if (!typesContained.contains(this.get(i).user)) {
-                    typesContained.add(this.get(i).user);
+                if (this.get(i).getScore()==baseScore) {
+                    System.out.println("removed user "+this.get(i).user);
+                    this.remove(i);
+                    i--;
+                }
+            }
+        }
+        
+        private void removeDtellaUsers(){
+            for(int i = 0; i < this.size(); i++) {
+                
+                if (this.get(i).user.startsWith("|")) {
+                    System.out.println("removed user "+this.get(i).user);
+                    this.remove(i);
+                    i--;
+                }
+            }
+        }
+        
+        private void removeDupes(){
+            ArrayList<String> usersContained = new ArrayList<>();
+            for(int i = 0; i < this.size(); i++) {
+                
+                if (!usersContained.contains(this.get(i).user)) {
+                    usersContained.add(this.get(i).user);
                 }
                 
-                else if (typesContained.contains(this.get(i).user)){
+                else if (usersContained.contains(this.get(i).user)){
                     this.remove(i);
                     i--;
                 }
