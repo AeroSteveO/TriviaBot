@@ -12,6 +12,15 @@ import org.pircbotx.hooks.events.MessageEvent;
 /**
  *
  * @author Steve-O
+ * 
+ * Requirements:
+ * - APIs
+ *    N/A
+ * - Custom Objects
+ *    QueueTime
+ * - Linked Classes
+ *    N/A
+ * 
  */
 public  class TimedWaitForQueue extends WaitForQueue{
     int time;
@@ -33,12 +42,13 @@ public  class TimedWaitForQueue extends WaitForQueue{
         this.time=time;
         QueueTime runnable = new QueueTime(event.getBot(),time,event.getChannel(),event.getBot().getUserBot(),key);
         this.t = new Thread(runnable);
-        runnable.giveT(this.t);
-        this.t.start();
+        runnable.giveT(t);
+        t.start();
     }
     
     public void end() throws InterruptedException{
+        this.t.interrupt();
         this.close(); //Close this EventQueue
-        this.t.join(1000); //Ensure the thread also closes
+        t.join(1000); //Ensure the thread also closes
     }
 }
