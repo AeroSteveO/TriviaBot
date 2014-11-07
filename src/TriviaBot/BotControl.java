@@ -18,6 +18,14 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
  * Part code from RoyalBot -- http://www.royalcraft.org/royaldev/royalbot
  * Rest of the code is from Wheatley, another bot coded by me
  *
+ * Requirements:
+ * - APIs
+ *    N/A
+ * - Custom Objects
+ *    N/A
+ * - Linked Classes
+ *    Global
+ * 
  * Activate Commands with:
  *      TriviaBot, join #[channel]
  *          Makes the bot join the given channel
@@ -53,7 +61,26 @@ public class BotControl extends ListenerAdapter{
 //                event.getBot().sendIRC().joinChannel(Global.channels.get(i).toString());
 //            }
         }
+        if (message.equalsIgnoreCase("!ram")){
+            if(event.getUser().getNick().equalsIgnoreCase(Global.botOwner)){
+                int usedRam = (int) (Runtime.getRuntime().totalMemory()/1024/1024); //make it MB
+                int freeRam = (int) (Runtime.getRuntime().freeMemory()/1024/1024);  //make it MB
+                event.getBot().sendIRC().message(event.getChannel().getName(), "I am currently using "+usedRam+"MB ram, with "+freeRam+"MB ram free");
+            }
+            else{
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "You do not have access to this command");
+            }
+        }
         
+        if (message.equalsIgnoreCase("!threads")){
+            if(event.getUser().getNick().equalsIgnoreCase(Global.botOwner)){
+                event.getBot().sendIRC().message(event.getChannel().getName(), "I am currently using "+Thread.activeCount()+" threads");
+            }
+            else{
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "You do not have access to this command");
+            }
+        }
+                
         if (message.equalsIgnoreCase(Global.mainNick+", please shutdown")||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {//||message.equalsIgnoreCase("!shutdown")
             if (event.getUser().getNick().equals(Global.botOwner)&&event.getUser().isVerified()){
                 Global.reconnect = false;
