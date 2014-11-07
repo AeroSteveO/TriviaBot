@@ -13,6 +13,15 @@ import org.pircbotx.hooks.events.MessageEvent;
 /**
  *
  * @author Steve-O
+ * 
+ * Requirements:
+ * - APIs
+ *    N/A
+ * - Custom Objects
+ *    N/A
+ * - Linked Classes
+ *    Global
+ * 
  * Object:
  *      QuestionUpdater
  * - Requires multiple inputs to properly send out updates to the channel
@@ -78,6 +87,7 @@ public class QuestionUpdater implements Runnable{
     
     public void end() throws InterruptedException{
         this.running = false;
+        this.t.interrupt();
         t.join(1000); //Ensure the thread also closes
     }
     
@@ -93,9 +103,8 @@ public class QuestionUpdater implements Runnable{
         try{
             Thread.sleep(this.time*1000);
         }
-        catch(Exception ex){
-            ex.printStackTrace();
-            System.out.println(ex.getMessage());
+        catch(InterruptedException ex){
+            
         }
         
         while (this.running&&this.counter<4){
@@ -110,9 +119,9 @@ public class QuestionUpdater implements Runnable{
                 
                 Thread.sleep(this.time*1000);
                 this.counter++; // just to make sure the queue stops before giving out more hints than it should
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.out.println(ex.getMessage());
+                
+            } catch (InterruptedException ex) {
+                
             }
         }
         
