@@ -39,6 +39,11 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
  *          Gives the current external IP address of the bot
  *      TriviaBot, shutdown
  *          Shuts down the bot
+ *      !ram
+ *          Responds with TriviaBot's current ram usage
+ *      !threads
+ *          Responds with the number of threads TriviaBot is using
+
  *
  */
 public class BotControl extends ListenerAdapter{
