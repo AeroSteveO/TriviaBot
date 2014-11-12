@@ -1,8 +1,8 @@
-/**
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+ /**
+  * To change this license header, choose License Headers in Project Properties.
+  * To change this template file, choose Tools | Templates
+  * and open the template in the editor.
+  */
 
 package TriviaBot;
 
@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.JoinEvent;
@@ -177,8 +178,9 @@ public class TriviaMain extends ListenerAdapter{
             // List out the overall standings of the trivia channel
             else if (command.equalsIgnoreCase("standings")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
                 int i=0;
-                Collections.sort(scores);
-                for(Score temp: scores){
+                scores.sort();
+                List<Score> scoreList = scores.getList();
+                for(Score temp: scoreList){
                     // If a score is zero, ignore it
                     if (temp.getScore()>0 && i<5)
                         event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
@@ -194,8 +196,9 @@ public class TriviaMain extends ListenerAdapter{
                 if (cmdSplit[1].matches("[0-9]+")){
                     int lim = Integer.parseInt(cmdSplit[1]);
                     int i=0;
-                    Collections.sort(scores);
-                    for(Score temp: scores){
+                    scores.sort();
+                    List<Score> scoreList = scores.getList();
+                    for(Score temp: scoreList){
                         // If a score is zero, ignore it
                         if (temp.getScore()>0 && i<lim)
                             event.getBot().sendIRC().message(event.getChannel().getName(), ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
@@ -222,8 +225,9 @@ public class TriviaMain extends ListenerAdapter{
                         
                         int i=0;
 //                int lim = Integer.parseInt(cmdSplit[1]);
-                        Collections.sort(scores);
-                        for(Score temp: scores){
+                        scores.sort();
+                        List<Score> scoreList = scores.getList();
+                        for(Score temp: scoreList){
                             // If a score is zero, ignore it
                             if (temp.getScore()>0){
                                 i++;
@@ -359,8 +363,9 @@ public class TriviaMain extends ListenerAdapter{
                         // Get the current game's standings
                         else if (command.equalsIgnoreCase("standings")){
                             int i=0;
-                            Collections.sort(currentGame);
-                            for(Score temp: currentGame){
+                            currentGame.sort();
+                            List<Score> scoreList = currentGame.getList();
+                            for(Score temp: scoreList){
                                 // If a score is zero, ignore it
                                 if (temp.getScore()>0)
                                     currentEvent.getBot().sendIRC().message(triviaChan, ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
@@ -375,8 +380,9 @@ public class TriviaMain extends ListenerAdapter{
                             if (cmdSplit[1].matches("[0-9]+")){
                                 int lim = Integer.parseInt(cmdSplit[1]);
                                 int i=0;
-                                Collections.sort(currentGame);
-                                for(Score temp: currentGame){
+                                currentGame.sort();
+                                List<Score> scoreList = currentGame.getList();
+                                for(Score temp: scoreList){
                                     // If a score is zero, ignore it
                                     if (temp.getScore()>0 && i<lim)
                                         currentEvent.getBot().sendIRC().message(triviaChan, ++i + " : " + temp.getUser() + ", Score : " + temp.getScore());
@@ -403,8 +409,9 @@ public class TriviaMain extends ListenerAdapter{
                                     
                                     int i=0;
 //                int lim = Integer.parseInt(cmdSplit[1]);
-                                    Collections.sort(currentGame);
-                                    for(Score temp: currentGame){
+                                    currentGame.sort();
+                                    List<Score> scoreList = currentGame.getList();
+                                    for(Score temp: scoreList){
                                         // If a score is zero, ignore it
                                         if (temp.getScore()>0){
                                             i++;
