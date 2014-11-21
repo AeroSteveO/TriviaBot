@@ -67,8 +67,7 @@ public class TriviaMain extends ListenerAdapter{
     int questionsTillAutoEnd = numQuestionsAllowedTillEnd;  // Number of questions left till trivia ends
     int timeBetweenUpdates = 10;                            // Seconds between each clue update    //30
     int time = 20;               // Seconds between the start of the trivia challenge and failure //160
-//    int votesTillStart = 3;       // Number of startVotes needed to start trivia
-    //int key=(int) (Math.random()*100000+1);
+    
     VoteLog startVotes = new VoteLog();                     // Log of current Votes for starting trivia
     VoteLog stopVotes  = new VoteLog();                     // Log of current Votes for stopping trivia
     
@@ -110,10 +109,10 @@ public class TriviaMain extends ListenerAdapter{
                 String mergeThis = cmdSplit[1];
                 String mergeIntoThis = cmdSplit[2];
                 
-                if (scores.getScore(mergeThis)<0){
+                if (scores.getScore(mergeThis) == Integer.MIN_VALUE){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), mergeThis+": USER NOT FOUND");
                 }
-                else if (scores.getScore(mergeIntoThis)<0){
+                else if (scores.getScore(mergeIntoThis) == Integer.MIN_VALUE){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), mergeIntoThis+": USER NOT FOUND");
                 }
                 
@@ -127,7 +126,7 @@ public class TriviaMain extends ListenerAdapter{
             else if (command.equalsIgnoreCase("score")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
                 int globalScore = scores.getScore(event.getUser().getNick());
                 
-                if (globalScore < 0){
+                if (globalScore == Integer.MIN_VALUE){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
                 }
                 else
@@ -138,7 +137,7 @@ public class TriviaMain extends ListenerAdapter{
                 String user = cmdSplit[1];
                 int globalScore = scores.getScore(user);
                 
-                if (globalScore < 0){
+                if (globalScore == Integer.MIN_VALUE){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
                 }
                 else
@@ -151,7 +150,7 @@ public class TriviaMain extends ListenerAdapter{
                 String score = command.split(" ")[2];
                 int userCurrentScore = scores.getScore(user);
                 
-                if (userCurrentScore < 0){
+                if (userCurrentScore == Integer.MIN_VALUE){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
                 }
                 
@@ -217,7 +216,7 @@ public class TriviaMain extends ListenerAdapter{
                 else{
                     int globalScore = scores.getScore(cmdSplit[1]);
                     
-                    if (globalScore < 0){
+                    if (globalScore ==Integer.MIN_VALUE){
                         event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
                         return;
                     }
@@ -341,7 +340,7 @@ public class TriviaMain extends ListenerAdapter{
                             int currentScore = currentGame.getScore(currentEvent.getUser().getNick());
                             int globalScore = scores.getScore(currentEvent.getUser().getNick());
                             
-                            if (currentScore < 0 || globalScore < 0){
+                            if (currentScore == Integer.MIN_VALUE || globalScore == Integer.MIN_VALUE){
                                 currentEvent.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
                             }
                             else
@@ -354,7 +353,7 @@ public class TriviaMain extends ListenerAdapter{
                             int currentScore = currentGame.getScore(user);
                             int globalScore = scores.getScore(user);
                             
-                            if (currentScore < 0 || globalScore < 0){
+                            if (currentScore == Integer.MIN_VALUE || globalScore == Integer.MIN_VALUE){
                                 currentEvent.getBot().sendIRC().notice(currentEvent.getUser().getNick(), "USER NOT FOUND");
                             }
                             else
@@ -401,7 +400,7 @@ public class TriviaMain extends ListenerAdapter{
                             else{
                                 int globalScore = currentGame.getScore(cmdSplit[1]);
                                 
-                                if (globalScore < 0){
+                                if (globalScore == Integer.MIN_VALUE){
                                     currentEvent.getBot().sendIRC().notice(triviaChan, "USER NOT FOUND");
                                     return;
                                 }
