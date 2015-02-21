@@ -9,6 +9,7 @@ package TriviaBot;
 import Objects.TimedWaitForQueue;
 import Objects.Question;
 import Objects.Answer;
+import static TriviaBot.TriviaMain.gameList;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -34,17 +35,19 @@ public class TriviaKick extends ListenerAdapter{
     @Override
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
+        String gameChan = event.getChannel().getName();
+        
         if (message.startsWith(Global.commandPrefix)){
             
             String command = message.split(Global.commandPrefix)[1];
             String[] cmdSplit = command.split(" ");
-            if (cmdSplit[0].equalsIgnoreCase("kick")){
+            if (cmdSplit[0].equalsIgnoreCase("kick")&&cmdSplit.length==2){
                 
                 String kicker = event.getUser().getNick();
                 String kickee = cmdSplit[1];
                 
-                if(event.getBot().getUserChannelDao().getAllUsers().contains(event.getBot().getUserChannelDao().getUser(kickee))) {
-                    
+                if(event.getBot().getUserChannelDao().getAllUsers().contains(event.getBot().getUserChannelDao().getUser(kickee))&&!gameList.contains(new String[] {gameChan, "kick", "long"})) {
+                    gameList.add(gameChan, "kick", "long");
                     String triviaChan = event.getChannel().getName();
                     Question kickQuestion = new Question();
                     Answer kickAnswer = new Answer(kickQuestion.getAnswer());
@@ -101,6 +104,10 @@ public class TriviaKick extends ListenerAdapter{
                             timedQueue.end();
                         }
                     }
+                    gameList.remove(gameChan, "kick");
+                }
+                else if (gameList.contains(new String[] {gameChan, "kick", "long"})){
+                    event.getBot().sendIRC().notice(event.getUser().getNick(), Colors.BOLD+"KICK: "+Colors.NORMAL+"Only one trivia game may be played at a time");
                 }
                 else {
                     event.getBot().sendIRC().notice(event.getUser().getNick(), Colors.BOLD+"KICK: "+Colors.NORMAL+"user not in channel");

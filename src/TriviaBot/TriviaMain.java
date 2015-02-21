@@ -7,6 +7,7 @@
 package TriviaBot;
 
 import Objects.Answer;
+import Objects.GameList;
 import Objects.Question;
 import Objects.Score;
 import Objects.Score.ScoreArray;
@@ -16,7 +17,6 @@ import org.pircbotx.hooks.events.MessageEvent;
 import Objects.Vote.VoteLog;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.pircbotx.User;
@@ -75,13 +75,17 @@ public class TriviaMain extends ListenerAdapter{
     String filename = "scores.json";
     boolean loaded = startScores();
     ArrayList<Integer> levels = scoreLevels();
+    public static GameList gameList = new GameList();
     
     @Override
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
+        String gameChan = event.getChannel().getName();
+        System.out.println(runTrivia);
         if (message.startsWith(Global.commandPrefix)){
             String command = message.split(Global.commandPrefix)[1];//.toLowerCase()
             String[] cmdSplit = command.split(" ");
+            
             // Admin start
             if (command.equalsIgnoreCase("start")
                     &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
@@ -123,50 +127,62 @@ public class TriviaMain extends ListenerAdapter{
             }
             
             // Get your current score
-            else if (command.equalsIgnoreCase("score")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
-                int globalScore = scores.getScore(event.getUser().getNick());
-                
-                if (globalScore == Integer.MIN_VALUE){
-                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
-                }
-                else
-                    event.respond("Your overall score is: "+globalScore);
-            }
+//            else if (command.equalsIgnoreCase("score")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+//                int globalScore = scores.getScore(event.getUser().getNick());
+//                
+//                if (globalScore == Integer.MIN_VALUE){
+//                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+//                }
+//                else
+//                    event.respond("Your overall score is: "+globalScore);
+//            }
             // Get someone elses current score
-            else if (cmdSplit[0].equalsIgnoreCase("score")&&command.split(" ").length==2){
-                String user = cmdSplit[1];
-                int globalScore = scores.getScore(user);
-                
-                if (globalScore == Integer.MIN_VALUE){
-                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+            else if (cmdSplit[0].equalsIgnoreCase("score")){
+                if(cmdSplit.length==1&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+                    int globalScore = scores.getScore(event.getUser().getNick());
+                    
+                    if (globalScore == Integer.MIN_VALUE){
+                        event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                    }
+                    else
+                        event.respond("Your overall score is: "+globalScore);
                 }
-                else
-                    event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+globalScore);
+                else if(command.split(" ").length==2){
+                    String user = cmdSplit[1];
+                    int globalScore = scores.getScore(user);
+                    
+                    if (globalScore == Integer.MIN_VALUE){
+                        event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                    }
+                    else
+                        event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+globalScore);
+                }
+                else if (command.split(" ").length==3
+                        &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()) {
+                    
+                    String user = command.split(" ")[1];
+                    String score = command.split(" ")[2];
+                    int userCurrentScore = scores.getScore(user);
+                    
+                    if (userCurrentScore == Integer.MIN_VALUE){
+                        event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
+                    }
+                    
+                    else if (!score.matches("[0-9]+")){
+                        event.getBot().sendIRC().notice(event.getUser().getNick(),"Input number must be an integer");
+                    }
+                    
+                    else if(score.matches("\\-[0-9]+")){
+                        event.getBot().sendIRC().notice(event.getUser().getNick(),"You cannot give a user a negative score");
+                    }
+                    
+                    else{
+                        scores.setScore(user, Integer.parseInt(score));
+                        event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+scores.getScore(user));
+                    }
+                }
             }
-            else if (cmdSplit[0].equalsIgnoreCase("score")&&command.split(" ").length==3
-                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()) {
-                
-                String user = command.split(" ")[1];
-                String score = command.split(" ")[2];
-                int userCurrentScore = scores.getScore(user);
-                
-                if (userCurrentScore == Integer.MIN_VALUE){
-                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
-                }
-                
-                else if (!score.matches("[0-9]+")){
-                    event.getBot().sendIRC().notice(event.getUser().getNick(),"Input number must be an integer");
-                }
-                
-                else if(score.matches("\\-[0-9]+")){
-                    event.getBot().sendIRC().notice(event.getUser().getNick(),"You cannot give a user a negative score");
-                }
-                
-                else{
-                    scores.setScore(user, Integer.parseInt(score));
-                    event.getBot().sendIRC().message(event.getChannel().getName(),user+"'s overall score is: "+scores.getScore(user));
-                }
-            }
+
             // Save the scores file
             else if (command.equalsIgnoreCase("save")
                     &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
@@ -244,8 +260,8 @@ public class TriviaMain extends ListenerAdapter{
             }
         }
         
-        if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())){
-            
+        if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
+            gameList.add(gameChan, "trivia", "long");
             if (startVotes.start(event.getChannel().getName())){
                 ArrayList<String> voters = startVotes.getUsers();
                 String startMessage="";
@@ -458,8 +474,17 @@ public class TriviaMain extends ListenerAdapter{
             }
             scores.merge(currentGame);
             Global.activeGames.deactivate(triviaChan);
+            gameList.remove(gameChan, "trivia");
+            startVotes.clear();
+            stopVotes.clear();
+            runTrivia=false;
+        }
+        else if (gameList.contains(new String[] {gameChan, "trivia", "long"})&&message.equalsIgnoreCase(Global.commandPrefix+"start")){
+            event.getBot().sendIRC().notice(event.getUser().getNick(), Colors.BOLD+"Trivia: "+Colors.NORMAL+"Only one trivia game may be played at a time");
         }
     }
+    
+    
     private ArrayList<Integer> scoreLevels(){
         ArrayList<Integer> levels = new ArrayList<>();
         levels.add(5);
