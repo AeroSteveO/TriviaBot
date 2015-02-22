@@ -95,18 +95,9 @@ public class TriviaBot extends ListenerAdapter {
                 }
                 event.getBot().sendIRC().notice(event.getUser().getNick(), "The full command list can be found at http://bit.ly/1rjHlt8");
             }
-//            else if(command.startsWith("test")){
-//                String answer = message.split(" ",2)[1];
-//                Answer test = new Answer(answer);
-//                event.respond(test.getClue()+" for "+test.reveal());
-//                event.respond(test.giveClue());
-//                event.respond(test.giveClue());
-//                event.respond(test.giveClue());
-//                event.respond(test.giveClue());
-//                event.respond(test.giveClue());
-//            }
+            
             else if (command.equalsIgnoreCase("die")){//||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
-                if (event.getUser().getNick().equals("Steve-O")){
+                if (event.getUser().getNick().equals(Global.botOwner)&&event.getUser().isVerified()){
                     Global.reconnect = false;
                     event.getBot().sendIRC().message(event.getChannel().getName(), "I still make Trebek look bad");
                     Random generator = new Random();
@@ -119,7 +110,7 @@ public class TriviaBot extends ListenerAdapter {
                     System.exit(0);
                 }
                 else
-                    event.getChannel().send().kick(event.getUser(), "PART 5! BOOBY TRAP THE STALEMATE BUTTON!"); // kick people for trying to kill the bot
+                    event.getChannel().send().kick(event.getUser(), "The price is wrong Bobby"); // kick people for trying to kill the bot
             }
         }
     }
@@ -134,7 +125,6 @@ public class TriviaBot extends ListenerAdapter {
     // Joins channels it has been invited to
     public void onInvite(InviteEvent event) {
         event.getBot().sendIRC().joinChannel(event.getChannel());
-//        Global.channels.add(new ChannelStore(event.getChannel())); //think this will work?
     }
     @Override
     // Set mode +B for Bots
@@ -153,7 +143,7 @@ public class TriviaBot extends ListenerAdapter {
                 .setLogin("TriviaBot")               // login part of hostmask, eg name:login@host
                 .setAutoNickChange(true)             // Automatically change nick when the current one is in use
                 .setCapEnabled(true)                 // Enable CAP features
-                .addAutoJoinChannel("#rapterverse")
+                .addAutoJoinChannel("#trivia")
                 .setNickservPassword(Global.nickPass)
                 .setAutoReconnect(true)
                 .setMaxLineLength(425)               // This is for the IRC networks I use, it can be increased/decreased as needed
@@ -162,7 +152,7 @@ public class TriviaBot extends ListenerAdapter {
                 .addListener(new TriviaMain())
                 .addListener(new TriviaKick())
                 .addListener(new BotControl())
-                .setServerHostname("irc.stevensnet.info"); //Join the official #pircbotx channel
+                .setServerHostname("irc.dhirc.com"); //Join the official #pircbotx channel
         //.buildConfiguration();
 //        BackgroundListener.addListener(new Logger(),true); //Add logger background listener
         Configuration config = configuration.buildConfiguration();
@@ -173,8 +163,6 @@ public class TriviaBot extends ListenerAdapter {
             Thread t = new Thread(parallel);
             parallel.giveT(t);
             t.start();
-            //PircBotX bot = new PircBotX(configuration);
-            //Global.bot.startBot();
         }
         catch (Exception ex) {
             ex.printStackTrace();
