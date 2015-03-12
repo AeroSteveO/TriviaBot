@@ -41,7 +41,7 @@ public class Runner implements Runnable {
     public void run() {
         try {
             bot.startBot();
-        } catch (IOException | IrcException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         while (Global.reconnect) {
