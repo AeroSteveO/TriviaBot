@@ -1,10 +1,10 @@
 X - DONE - end trivia after 5 questions with no answers from users, or no chat from users
 X - DONE - get 3 votes to start trivia without an op, otherwise ops can start or stop
 X - DONE - local and global score, one for current trivia session, one for overall points scored in trivia
+X - DONE - skip question
+X - DONE - next question
 
-next question
 give clue
-skip question
 
 !duel user to challenge user to duel, waits for challenge accepted type of phrase to start
 !duel to make general duel challenge, waits for second person to use !duel to start the duel
@@ -14,3 +14,44 @@ skip question
 -Users add questions to be verified and approved by ops
 -List out questions waiting for approval/disapproval
 -Create new text file for questions added by irc people, make sure they don't end up repeating extremely frequently
+
+
+
+<~theDoctor> Steve-O do you have a timeout for TriviaBot 
+<~theDoctor> in general
+<~theDoctor> as in nothing is said, it dies
+<~Steve-O> Yeah
+<~Steve-O> 3 or 5 questions
+<~Steve-O> Don't remember which but I think it's 3
+<~theDoctor> you should do a decreased timeout after !stop
+<~theDoctor> from any number of people
+<~theDoctor> for that situation
+<~Steve-O> The timeout is based on channel activity too
+<~theDoctor> yea
+<~Steve-O> Not successful answering of questions
+<~theDoctor> but as in if BODpc was the only one here
+<~theDoctor> did !stop to end it
+<~theDoctor> it should end
+<+BODpc> ^
+<~theDoctor> so maybe a notice to them, get everyone else to say stop or i will end after this question
+<~theDoctor> and notice the channel if nothing is said by the end of this question, the game will end
+<~theDoctor> something like that
+<~theDoctor> so it cant be abused
+<~Steve-O> But znc pretty much prevents the channel from being empty completely
+<~theDoctor> i mean if BODpc is the only active
+<~theDoctor> we were playing
+<~theDoctor> fizzled out to go fap
+<~theDoctor> he is all thats left
+<+BODpc> (._.)
+<~theDoctor> it shouldnt have to wait 3q to stop if he is the only active one
+<~Steve-O> Ehh yeah, how do I determine use activity though? Who the previous ten lines were from? 
+<~Steve-O> Get the number of active users from that
+<theDoctor> here is how i would do it
+<theDoctor> when someone does !stop it messages the user and lets them know: trivia bot will stop after the next question or as soon as 2 other people use !stop
+<theDoctor> and notifies the channel that 'i will stop after the next question if there is no activity or immediately if !stop is used;
+<theDoctor> and make the pm to the user include no activity as well for stoping after next question
+<theDoctor> and if no one responds to trivia bot, then it stops
+<theDoctor> or messages in the channel rather
+<theDoctor> i would also put in a case, if someone else does !stop in the time window, but not 2, then it should continue as if no activity
+<theDoctor> also, for the timeout if no one answers questions, you should do the same timeout for 1 person
+<theDoctor> so you cant just rack up points
