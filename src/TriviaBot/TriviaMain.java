@@ -63,7 +63,7 @@ import org.pircbotx.hooks.events.UserListEvent;
  */
 public class TriviaMain extends ListenerAdapter{
     boolean runTrivia = false;                              // Should Trivia Be Running
-    int numQuestionsAllowedTillEnd = 5;                     // Number of questions allowed to go without response till trivia ends
+    int numQuestionsAllowedTillEnd = 3;                     // Number of questions allowed to go without response till trivia ends
     int questionsTillAutoEnd = numQuestionsAllowedTillEnd;  // Number of questions left till trivia ends
     int timeBetweenUpdates = 10;                            // Seconds between each clue update    //30
     int time = 20;               // Seconds between the start of the trivia challenge and failure //160
@@ -81,7 +81,7 @@ public class TriviaMain extends ListenerAdapter{
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
         String gameChan = event.getChannel().getName();
-        System.out.println(runTrivia);
+        
         if (message.startsWith(Global.commandPrefix)){
             String command = message.split(Global.commandPrefix)[1];//.toLowerCase()
             String[] cmdSplit = command.split(" ");
@@ -95,6 +95,12 @@ public class TriviaMain extends ListenerAdapter{
             // User start
             else if (command.equalsIgnoreCase("start")){
                 startVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
+            }
+            // Admin stop
+            else if (command.equalsIgnoreCase("stop")
+                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
+                
+                runTrivia = false;
             }
             // User stop
             else if (command.equalsIgnoreCase("stop")){
@@ -280,6 +286,8 @@ public class TriviaMain extends ListenerAdapter{
             int updateKey = (int) (Math.random()*100000+1);
             int counter = 0;
             
+            VoteLog skipVotes = new VoteLog();
+            
             String triviaChan = event.getChannel().getName();
             Global.activeGames.activate(triviaChan);
             Question triviaQuestion = new Question();
@@ -363,7 +371,7 @@ public class TriviaMain extends ListenerAdapter{
                                 currentEvent.respond("Your current score is: "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and your overall score is: "+Colors.BOLD+Colors.RED+globalScore);
                         }
                         // Get someone elses current score
-                        else if (command.toLowerCase().startsWith("score")&&command.split(" ").length==2){
+                        else if (cmdSplit[0].equalsIgnoreCase("score")&&cmdSplit.length==2){
                             
                             String user = command.split(" ")[1];
                             int currentScore = currentGame.getScore(user);
@@ -375,6 +383,36 @@ public class TriviaMain extends ListenerAdapter{
                             else
                                 currentEvent.getBot().sendIRC().message(triviaChan,user+"'s current score is "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and their overall score is "+Colors.BOLD+Colors.RED+globalScore);
                         }
+                        // SKIP THE CURRENT QUESTION
+                        else if (cmdSplit[0].equalsIgnoreCase("skip")){
+                            // Admin start
+                            if (skipVotes.start()||(Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified())){
+                                
+//                                event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
+                                event.getBot().sendIRC().message(triviaChan,"This question will be skipped. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
+                                
+                                triviaQuestion.endQuestionUpdates();
+                                triviaQuestion = new Question();
+                                
+                                key=(int) (Math.random()*100000+1);
+                                updateKey = (int) (Math.random()*100000+1);
+                                triviaAnswer = new Answer(triviaQuestion.getAnswer());
+                                
+                                event.getBot().sendIRC().message(triviaChan,"Next Question:");
+                                event.getBot().sendIRC().message(triviaChan,triviaQuestion.getQuestion());
+                                event.getBot().sendIRC().message(triviaChan,"Clue: "+triviaAnswer.getClue());
+                                
+                                triviaQuestion.startQuestionUpdates(event, timeBetweenUpdates, key, updateKey);
+                                counter = 0;
+                                skipVotes.clear();
+//                                runTrivia = true;
+                            }
+                            // User start
+                            else {
+                                skipVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
+                            }
+                        }
+                        
                         // Get the current game's standings
                         else if (command.equalsIgnoreCase("standings")){
                             int i=0;
