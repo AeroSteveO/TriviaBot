@@ -42,6 +42,7 @@ public class Question {
     QuestionUpdater runnable;
     private int key = 0;
     private int updateKey = 0;
+    private String rawText = null;
     
     public Question(){
         getNewQuestion();
@@ -86,13 +87,18 @@ public class Question {
     }
     
     public void getNewQuestion(){
-        String[] tmp = loadRandomQuestionFromFile().split("`");
+        this.rawText = loadRandomQuestionFromFile();
+        String[] tmp = rawText.split("`");
         this.answer=tmp[1].trim();
         this.question = tmp[0].trim();
     }
     
     public String getAnswer(){
         return this.answer;
+    }
+    
+    public String getRaw(){
+        return this.rawText;
     }
     
     public String getQuestion(){
