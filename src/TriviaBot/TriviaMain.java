@@ -15,6 +15,7 @@ import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 import Objects.Vote.VoteLog;
+import Utils.TextUtils;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -71,6 +72,8 @@ public class TriviaMain extends ListenerAdapter{
     VoteLog startVotes = new VoteLog();                     // Log of current Votes for starting trivia
     VoteLog stopVotes  = new VoteLog();                     // Log of current Votes for stopping trivia
     
+    Question previousQuestion = new Question();
+    
     ScoreArray scores = new ScoreArray();
     String filename = "scores.json";
     boolean loaded = startScores();
@@ -113,6 +116,25 @@ public class TriviaMain extends ListenerAdapter{
                 runTrivia = false;
             }
             
+            else if (cmdSplit[0].equalsIgnoreCase("report")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+                if (cmdSplit.length==2){
+                    if(cmdSplit[1].equalsIgnoreCase("current")){
+                        event.respond("No current trivia question");
+                    }
+                    else if (cmdSplit[1].equalsIgnoreCase("previous")){
+                        TextUtils.addToDoc("TriviaQuestionIssues.txt", event.getUser().getNick()+" is reporting: "+previousQuestion.getRaw());
+                        event.getBot().sendIRC().message(event.getChannel().getName(),"Question: "+Colors.RED+previousQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
+                        event.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+event.getUser().getNick());
+                    }
+                    else{
+                        event.respond("Report requires an input of either 'current' or 'previous' to signify which question you are reporting");
+                    }
+                }
+                else{
+                    event.respond("Report requires an input of either 'current' or 'previous' to signify which question you are reporting");
+                }
+            }
+            
             else if (cmdSplit[0].equalsIgnoreCase("combine")&&cmdSplit.length==3
                     &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()) {
                 
@@ -135,7 +157,7 @@ public class TriviaMain extends ListenerAdapter{
             // Get your current score
 //            else if (command.equalsIgnoreCase("score")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
 //                int globalScore = scores.getScore(event.getUser().getNick());
-//                
+//
 //                if (globalScore == Integer.MIN_VALUE){
 //                    event.getBot().sendIRC().notice(event.getUser().getNick(), "USER NOT FOUND");
 //                }
@@ -188,7 +210,7 @@ public class TriviaMain extends ListenerAdapter{
                     }
                 }
             }
-
+            
             // Save the scores file
             else if (command.equalsIgnoreCase("save")
                     &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
@@ -329,6 +351,7 @@ public class TriviaMain extends ListenerAdapter{
                         event.getBot().sendIRC().message(triviaChan,"Looks like nobody is around, Thanks for playing trivia! Come again soon!");
                         running = false;
                         stopVotes.clear();
+                        previousQuestion = triviaQuestion;
                         triviaQuestion.endQuestionUpdates();
                         queue.close();
                     }
@@ -337,6 +360,7 @@ public class TriviaMain extends ListenerAdapter{
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
                         
                         triviaQuestion.endQuestionUpdates();
+                        previousQuestion = triviaQuestion;
                         triviaQuestion = new Question();
                         
                         key=(int) (Math.random()*100000+1);
@@ -370,6 +394,27 @@ public class TriviaMain extends ListenerAdapter{
                             else
                                 currentEvent.respond("Your current score is: "+Colors.BOLD+Colors.RED+currentScore+Colors.NORMAL+" and your overall score is: "+Colors.BOLD+Colors.RED+globalScore);
                         }
+                        
+                        else if (cmdSplit[0].equalsIgnoreCase("report")){
+                            if (cmdSplit.length==2){
+                                if(cmdSplit[1].equalsIgnoreCase("current")){
+                                    TextUtils.addToDoc("TriviaQuestionIssues.txt", currentEvent.getUser().getNick()+" is reporting: "+triviaQuestion.getRaw());
+                                    currentEvent.getBot().sendIRC().message(currentEvent.getChannel().getName(),"Question: "+Colors.RED+triviaQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
+                                    currentEvent.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+currentEvent.getUser().getNick());
+                                }
+                                else if (cmdSplit[1].equalsIgnoreCase("previous")){
+                                    TextUtils.addToDoc("TriviaQuestionIssues.txt", currentEvent.getUser().getNick()+" is reporting: "+previousQuestion.getRaw());
+                                    currentEvent.getBot().sendIRC().message(currentEvent.getChannel().getName(),"Question: "+Colors.RED+previousQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
+                                    currentEvent.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+currentEvent.getUser().getNick());
+                                }
+                                else{
+                                    currentEvent.respond("Report requires an input of either 'current' or 'previous' to signify which question you are reporting");
+                                }
+                            }
+                            else{
+                                currentEvent.respond("Report requires an input of either 'current' or 'previous' to signify which question you are reporting");
+                            }
+                        }
                         // Get someone elses current score
                         else if (cmdSplit[0].equalsIgnoreCase("score")&&cmdSplit.length==2){
                             
@@ -392,6 +437,7 @@ public class TriviaMain extends ListenerAdapter{
                                 event.getBot().sendIRC().message(triviaChan,"This question will be skipped. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
                                 
                                 triviaQuestion.endQuestionUpdates();
+                                previousQuestion = triviaQuestion;
                                 triviaQuestion = new Question();
                                 
                                 key=(int) (Math.random()*100000+1);
@@ -491,6 +537,7 @@ public class TriviaMain extends ListenerAdapter{
                         
                         counter = 0;
                         triviaQuestion.endQuestionUpdates();
+                        previousQuestion = triviaQuestion;
                         triviaQuestion = new Question();
                         key=(int) (Math.random()*100000+1);
                         updateKey = (int) (Math.random()*100000+1);
