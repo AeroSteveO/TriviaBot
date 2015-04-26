@@ -153,14 +153,19 @@ public class TriviaRequest extends ListenerAdapter {
     }
     private ArrayList<String> getDefinitions() {
         try{
-            Scanner wordfile = new Scanner(new File(requestFileName));
+            File file = new File(requestFileName);
+            if (!file.exists()){
+                file.createNewFile();
+                return null;
+            }
+            Scanner wordfile = new Scanner(file);
             ArrayList<String> wordls = new ArrayList<String>();
             while (wordfile.hasNext()){
                 wordls.add(wordfile.nextLine());
             }
             wordfile.close();
             return (wordls);
-        } catch (FileNotFoundException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
