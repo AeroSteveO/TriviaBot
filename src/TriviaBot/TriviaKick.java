@@ -19,9 +19,9 @@ import org.pircbotx.hooks.events.MessageEvent;
  * @author Steve-O
  *
  * Activate Command with:
- *      !kick
+ *      !Kick
  *          Kicks the user who sent the command
- *      !kick [user]
+ *      !Kick [user]
  *          Starts a trivia game in which the caller can answer a trivia
  *          question to get the user kicked, if the caller of the function fails,
  *          they get a 1 minute ban and kicked from the chan, if the user answers
@@ -30,8 +30,10 @@ import org.pircbotx.hooks.events.MessageEvent;
  *
  */
 public class TriviaKick extends ListenerAdapter{
+    
     int time = 60;               // Seconds between the start of the trivia challenge and failure
     int timeBetweenUpdates = 15; // Seconds between each clue update
+    
     @Override
     public void onMessage(MessageEvent event) throws InterruptedException, Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage());
@@ -43,13 +45,16 @@ public class TriviaKick extends ListenerAdapter{
             String[] cmdSplit = command.split(" ");
             if (cmdSplit[0].equalsIgnoreCase("kick")&&cmdSplit.length==2){
                 
-                String kicker = event.getUser().getNick();
-                String kickee = cmdSplit[1];
+                String kicker = event.getUser().getNick();  // THE PERSON DOING THE KICK
+                String kickee = cmdSplit[1];                // THE PERSON BEING KICKED
                 
                 if(event.getBot().getUserChannelDao().getAllUsers().contains(event.getBot().getUserChannelDao().getUser(kickee))&&!gameList.contains(new String[] {gameChan, "kick", "long"})) {
+                    
                     gameList.add(gameChan, "kick", "long");
                     String triviaChan = event.getChannel().getName();
+                    
                     Question kickQuestion = new Question();
+                    TriviaMain.currentQuestion = kickQuestion;
                     Answer kickAnswer = new Answer(kickQuestion.getAnswer());
                     
                     event.getBot().sendIRC().message(event.getChannel().getName(),"Question:");
@@ -76,6 +81,10 @@ public class TriviaKick extends ListenerAdapter{
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(event.getUser().getNick()), "You are the weakest link, goodbye");
                             running = false;
+                            
+                            TriviaMain.previousQuestion = kickQuestion;
+                            TriviaMain.currentQuestion = null;
+                            
                             kickQuestion.endQuestionUpdates();
                             timedQueue.end();
                         }
@@ -91,6 +100,10 @@ public class TriviaKick extends ListenerAdapter{
                             event.getBot().sendRaw().rawLine("tban " + event.getChannel().getName() + " 1m " + event.getUser().getNick() + "!*@*");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kicker), "You are the weakest link, goodbye");
                             running = false;
+                            
+                            TriviaMain.previousQuestion = kickQuestion;
+                            TriviaMain.currentQuestion = null;
+
                             kickQuestion.endQuestionUpdates();
                             timedQueue.end();
                         }
@@ -100,6 +113,10 @@ public class TriviaKick extends ListenerAdapter{
                             event.getBot().sendIRC().message(triviaChan,kicker.toUpperCase()+", YOU HAVE SUCCEEDED!");
                             event.getChannel().send().kick(event.getBot().getUserChannelDao().getUser(kickee), "You are the weakest link, goodbye");
                             running = false;
+                            
+                            TriviaMain.previousQuestion = kickQuestion;
+                            TriviaMain.currentQuestion = null;
+                            
                             kickQuestion.endQuestionUpdates();
                             timedQueue.end();
                         }
