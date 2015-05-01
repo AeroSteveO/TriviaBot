@@ -8,7 +8,6 @@ package TriviaBot;
 
 import java.util.ArrayList;
 import org.pircbotx.PircBotX;
-import Objects.TriviaGames.TriviaArray;
 
 /**
  *
