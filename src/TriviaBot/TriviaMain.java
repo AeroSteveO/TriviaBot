@@ -117,7 +117,7 @@ public class TriviaMain extends ListenerAdapter{
                 runTrivia = false;
             }
             
-            else if (cmdSplit[0].equalsIgnoreCase("report")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+            else if (cmdSplit[0].equalsIgnoreCase("report")&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
                 if (cmdSplit.length==2){
                     if(cmdSplit[1].equalsIgnoreCase("current")){
                         if (currentQuestion == null)
@@ -177,7 +177,7 @@ public class TriviaMain extends ListenerAdapter{
 //            }
             // Get someone elses current score
             else if (cmdSplit[0].equalsIgnoreCase("score")){
-                if(cmdSplit.length==1&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+                if(cmdSplit.length==1&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
                     int globalScore = scores.getScore(event.getUser().getNick());
                     
                     if (globalScore == Integer.MIN_VALUE){
@@ -230,7 +230,7 @@ public class TriviaMain extends ListenerAdapter{
                 scores.saveToJSON();
             }
             // List out the overall standings of the trivia channel
-            else if (command.equalsIgnoreCase("standings")&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+            else if (command.equalsIgnoreCase("standings")&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
                 int i=0;
                 scores.sort();
                 List<Score> scoreList = scores.getList();
@@ -245,7 +245,7 @@ public class TriviaMain extends ListenerAdapter{
                 }
             }
             
-            else if (cmdSplit[0].equalsIgnoreCase("standings")&&cmdSplit.length==2&&!Global.activeGames.isGameActive(event.getChannel().getName())){
+            else if (cmdSplit[0].equalsIgnoreCase("standings")&&cmdSplit.length==2&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
                 
                 if (cmdSplit[1].matches("[0-9]+")){
                     int lim = Integer.parseInt(cmdSplit[1]);
@@ -299,7 +299,7 @@ public class TriviaMain extends ListenerAdapter{
             }
         }
         
-        if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!Global.activeGames.isGameActive(event.getChannel().getName())&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
+        if ((runTrivia||startVotes.start(event.getChannel().getName()))&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
             gameList.add(gameChan, "trivia", "long");
             if (startVotes.start(event.getChannel().getName())){
                 ArrayList<String> voters = startVotes.getUsers();
@@ -322,7 +322,7 @@ public class TriviaMain extends ListenerAdapter{
             VoteLog skipVotes = new VoteLog();
             
             String triviaChan = event.getChannel().getName();
-            Global.activeGames.activate(triviaChan);
+//            Global.activeGames.activate(triviaChan);
             
             Question triviaQuestion = new Question();
             currentQuestion = triviaQuestion;
@@ -587,7 +587,7 @@ public class TriviaMain extends ListenerAdapter{
                 }
             }
             scores.merge(currentGame);
-            Global.activeGames.deactivate(triviaChan);
+//            Global.activeGames.deactivate(triviaChan);
             gameList.remove(gameChan, "trivia");
             startVotes.clear();
             stopVotes.clear();
