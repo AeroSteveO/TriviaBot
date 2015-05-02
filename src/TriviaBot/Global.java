@@ -23,13 +23,13 @@ import org.pircbotx.PircBotX;
  *
  */
 public class Global {
-    public static String botOwner = "Steve-O"; 
-    public static ArrayList<String> botAdmins = getBotAdmins();
-    public static String mainNick = "TriviaBot";     
-    public static String nickPass = ""; 
+    public static String botOwner; 
+    public static ArrayList<String> botAdmins;
+    public static String mainNick;     
+    public static String nickPass; 
     public static boolean reconnect = true;
     public static PircBotX bot;
-    public static String commandPrefix = "!";
+    public static String commandPrefix;
 //    public static TriviaArray activeGames = new TriviaArray();
     
     private static ArrayList<String> getBotAdmins() {
