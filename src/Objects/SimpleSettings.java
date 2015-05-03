@@ -232,7 +232,7 @@ public class SimpleSettings {
             Scanner wordfile = new Scanner(file);
             String wordls = "";
             while (wordfile.hasNext()){
-                wordls= wordls+(wordfile.next());
+                wordls= wordls+(wordfile.nextLine());
             }
             wordfile.close();
             return (wordls);
