@@ -26,16 +26,19 @@ import java.util.Scanner;
  *    N/A
  * - Custom Objects
  *    N/A
+ *  - Utilities
+ *    N/A
  * - Linked Classes
  *    N/A
  *
  * Methods:
- *     *loadText       - loads the input file as a string
- *     *loadTextAsList - loads the input file as an array, where each line in the file is a new item in the array
- *     *readUrl        - loads the url and returns a string of the contents
- *     *addToDoc       - adds the input text as a new line at the bottom of the input text file
+ *     *loadText         - Loads the input file as a string
+ *     *loadTextAsList   - Loads the input file as an array, where each line in the file is a new item in the array
+ *     *readUrl          - Loads the url and returns a string of the contents
+ *     *addToDoc         - Adds the input text as a new line at the bottom of the input text file
+ *     *addToDocIfUnique - Adds a line to the end of the input text file if that line is unique in that file
  *
- * Note: Only commands marked with a * are available for use outside the object 
+ * Note: Only commands marked with a * are available for use outside the object
  *
  */
 public class TextUtils {
@@ -45,6 +48,8 @@ public class TextUtils {
         return (loadText(file));
     }
     public static String loadText(File file) throws FileNotFoundException, IOException{
+//        File file =new File(filename);
+        //if file doesnt exists, then create it
         if(!file.exists()){
             file.createNewFile();
             return null;
@@ -54,7 +59,7 @@ public class TextUtils {
             Scanner wordfile = new Scanner(file);
             String wordls = "";
             while (wordfile.hasNext()){
-                wordls= wordls+(wordfile.next());
+                wordls= wordls+(wordfile.nextLine());
             }
             wordfile.close();
             return (wordls);
@@ -74,7 +79,7 @@ public class TextUtils {
 //new File("wordlist.txt")
             ArrayList<String> wordls = new ArrayList<String>();
             while (wordfile.hasNext()){
-                wordls.add(wordfile.next());
+                wordls.add(wordfile.nextLine());
             }
             wordfile.close();
             return (wordls);
@@ -85,7 +90,7 @@ public class TextUtils {
     }
     
     //converts URL to string, primarily used to string-ify json text
-    private static String readUrl(String urlString) throws Exception {
+    public static String readUrl(String urlString) throws Exception {
 //        System.out.println(urlString);
         BufferedReader reader = null;
         try {
@@ -104,6 +109,58 @@ public class TextUtils {
                 reader.close();
         }
     }
+    public static boolean addToDocIfUnique(String filename, String addition){
+        try{
+            File file;
+            
+            if (filename.split("\\.").length==1){
+                file =new File(filename+".txt");
+                filename = filename+".txt";
+            }
+            else{
+                file =new File(filename);
+            }
+            
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            
+            return addToDocIfUnique(file,addition);
+            
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean addToDocIfUnique(File file, String addition){
+        try{
+            
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            ArrayList<String> listing = loadTextAsList(file);
+            CaseInsensitiveList current = new CaseInsensitiveList();
+            
+            current.addAll(listing);
+            
+            if (current.contains(addition)){
+                return false;
+            }
+            else{
+                FileWriter fileWritter = new FileWriter(file.getName(),true);
+                BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+                bufferWritter.write("\n"+addition);
+                bufferWritter.close();
+                return true;
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
     
     public static void addToDoc(String filename, String addition){
         try{
@@ -143,6 +200,16 @@ public class TextUtils {
             
         } catch (Exception ex){
             ex.printStackTrace();
+        }
+    }
+    private static class CaseInsensitiveList extends ArrayList<String> {
+        @Override
+        public boolean contains(Object o) {
+            String paramStr = (String)o;
+            for (String s : this) {
+                if (paramStr.equalsIgnoreCase(s)) return true;
+            }
+            return false;
         }
     }
 }
