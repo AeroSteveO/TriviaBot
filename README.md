@@ -32,3 +32,4 @@ There needs to be an army of editors to go through the 350+k lines and format th
 The bot was written to catch malformed questions so it wouldn't crash, but if it technically matches <string>`<string>
 there's no way for the bot to understand that's not part of the question.
 
+  * Pull requests and feature requests are welcome
