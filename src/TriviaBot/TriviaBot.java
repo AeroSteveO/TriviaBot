@@ -151,6 +151,7 @@ public class TriviaBot extends ListenerAdapter {
             serverSettings.create("botadmins",new ArrayList<String>(Arrays.asList(new String[]{"admin1","admin2"})));
             serverSettings.create("password","password");
             serverSettings.save();
+            System.out.println("A new settings file has been generated, please fill out the file and restart the bot");
             System.exit(0);
         }
         
