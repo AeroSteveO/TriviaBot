@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -37,11 +38,15 @@ import java.util.Scanner;
  *     *readUrl          - Loads the url and returns a string of the contents
  *     *addToDoc         - Adds the input text as a new line at the bottom of the input text file
  *     *addToDocIfUnique - Adds a line to the end of the input text file if that line is unique in that file
+ *     *readUrlUsingGet  - Reads the input URL using a GET and the class user agent and returns a String
+ *                         (Sometimes this will work when readUrl does not)
  *
  * Note: Only commands marked with a * are available for use outside the object
  *
  */
 public class TextUtils {
+    private final String USER_AGENT = "Mozilla/5.0";
+    
     public static String loadText(String filename) throws FileNotFoundException, IOException{
         File file =new File(filename);
         
@@ -69,21 +74,27 @@ public class TextUtils {
             return null;
         }
     }
-    public static ArrayList<String> loadTextAsList(String filename) throws FileNotFoundException{
+    public static ArrayList<String> loadTextAsList(String filename) {
         return loadTextAsList(new File(filename));
     }
     
-    public static ArrayList<String> loadTextAsList(File file) throws FileNotFoundException{
+    public static ArrayList<String> loadTextAsList(File file) {
         try{
+            
+            if(!file.exists()){
+                file.createNewFile();
+                return null;
+            }
+            
             Scanner wordfile = new Scanner(file);
 //new File("wordlist.txt")
             ArrayList<String> wordls = new ArrayList<String>();
             while (wordfile.hasNext()){
-                wordls.add(wordfile.nextLine());
+                wordls.add(wordfile.nextLine().trim());
             }
             wordfile.close();
             return (wordls);
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -103,12 +114,44 @@ public class TextUtils {
                 buffer.append(chars, 0, read);
             return buffer.toString();
         }catch(IOException ex){
+            ex.printStackTrace();
             return(null);
         }finally {
             if (reader != null)
                 reader.close();
         }
     }
+    
+    public String readUrlUsingGet(String url) throws Exception {
+        
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        
+        con.setRequestMethod("GET");
+        
+        //add request header
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        
+//        con.setRequestProperty("X-Mashape-Key", key);
+        
+        int responseCode = con.getResponseCode();
+//        System.out.println("\nSending 'GET' request to URL : " + url);
+//        System.out.println("Response Code : " + responseCode);
+        
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        
+//        System.out.println(response.toString());
+        return response.toString();
+    }
+    
     public static boolean addToDocIfUnique(String filename, String addition){
         try{
             File file;
