@@ -59,10 +59,17 @@ package TriviaBot;
 
 import Objects.Runner;
 import Objects.SimpleSettings;
+import Utils.OSUtils;
+import com.google.common.io.Files;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -79,6 +86,8 @@ import org.pircbotx.hooks.managers.BackgroundListenerManager;
  * @author Steve-O
  */
 public class TriviaBot extends ListenerAdapter {
+    String updateScript = "git --work-tree=/home/autodl/TriviaBot2/repo --git-dir=/home/autodl/TriviaBot2/repo/.git pull";
+    String copyScript = "cp /home/autodl/TriviaBot2/repo/questions/* /home/autodl/TriviaBot2/questions/";
     
     @Override
     public void onMessage(final MessageEvent event) throws Exception {
@@ -100,6 +109,40 @@ public class TriviaBot extends ListenerAdapter {
                 event.getBot().sendIRC().notice(event.getUser().getNick(), "The full command list can be found at http://bit.ly/1rjHlt8");
             }
             
+            else if (command.equalsIgnoreCase("update") && event.getUser().getNick().equalsIgnoreCase(Global.botOwner) && event.getUser().isVerified()) {
+                try {
+                    if (OSUtils.isWindows()) {
+                        event.respond("Update functionality is not supported on this system");
+                    }
+                    else {
+                        Process p = Runtime.getRuntime().exec(updateScript);
+                        p.waitFor();
+                        StringBuffer output = new StringBuffer();
+
+                        BufferedReader reader = 
+                            new BufferedReader(new InputStreamReader(p.getInputStream()));
+ 
+                        String line = "";			
+			while ((line = reader.readLine())!= null) {
+				output.append(line + "\n");
+			}
+                        
+                        ArrayList<File> newQuestions = getDirectoryFileList("repo/questions/");
+                        ArrayList<File> oldQuestions = getDirectoryFileList("questions/");
+                        for (int i = 0; i < newQuestions.size(); i++) {
+                            Files.copy(newQuestions.get(i), oldQuestions.get(i));
+                        }
+
+                        System.out.println(output);
+                        event.respond("Questions updated successfully (probably)");
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    Logger.getLogger(TriviaBot.class.getName()).log(Level.SEVERE, null, ex);
+                    event.respond("Questions failed to update");
+                }
+            }
+            
             else if (command.equalsIgnoreCase("die")){//||message.equalsIgnoreCase(Global.mainNick+", shutdown")) {
                 if (event.getUser().getNick().equals(Global.botOwner)&&event.getUser().isVerified()){
                     Global.reconnect = false;
@@ -118,6 +161,21 @@ public class TriviaBot extends ListenerAdapter {
             }
         }
     }
+    
+    private ArrayList<File> getDirectoryFileList(String directory){
+        File folder = new File(directory);
+        File[] listOfFilesAndFolders = folder.listFiles();
+        ArrayList<File> listOfFiles = new ArrayList<>();// = new File[];
+        for (int i = 0; i < listOfFilesAndFolders.length; i++) {
+            if (listOfFilesAndFolders[i].isFile()) {
+                listOfFiles.add(listOfFilesAndFolders[i]);
+            } else if (listOfFilesAndFolders[i].isDirectory()) {
+                System.out.println("Directory " + listOfFilesAndFolders[i].getName());
+            }
+        }
+        return listOfFiles;
+    }
+    
     @Override
     // Rejoin on Kick
     public void onKick(KickEvent event) throws Exception {
