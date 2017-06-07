@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package Objects;
+package rapternet.irc.bots.triviabot.objects;
 
-import TriviaBot.Global;
+import rapternet.irc.bots.triviabot.Global;
 import java.io.IOException;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;

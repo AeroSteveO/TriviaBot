@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package Objects;
+package rapternet.irc.bots.triviabot.objects;
 
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.MessageEvent;

@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package Utils;
+package rapternet.irc.bots.triviabot.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

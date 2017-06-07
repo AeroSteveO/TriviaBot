@@ -55,11 +55,11 @@
  * players, wait some, then continue.
  */
 
-package TriviaBot;
+package rapternet.irc.bots.triviabot;
 
-import Objects.Runner;
-import Objects.SimpleSettings;
-import Utils.OSUtils;
+import rapternet.irc.bots.triviabot.objects.Runner;
+import rapternet.irc.bots.triviabot.objects.SimpleSettings;
+import rapternet.irc.bots.triviabot.utils.OSUtils;
 import com.google.common.io.Files;
 import java.io.BufferedReader;
 import java.io.File;
@@ -86,9 +86,12 @@ import org.pircbotx.hooks.managers.BackgroundListenerManager;
  * @author Steve-O
  */
 public class TriviaBot extends ListenerAdapter {
-    String updateScript = "git --work-tree=/home/autodl/TriviaBot2/repo --git-dir=/home/autodl/TriviaBot2/repo/.git pull";
-    String copyScript = "cp /home/autodl/TriviaBot2/repo/questions/* /home/autodl/TriviaBot2/questions/";
+//    String updateScript = "git --work-tree=/home/autodl/TriviaBot2/repo --git-dir=/home/autodl/TriviaBot2/repo/.git pull";
+//    String copyScript = "cp /home/autodl/TriviaBot2/repo/questions/* /home/autodl/TriviaBot2/questions/";
     
+    String updateScript = "git --work-tree=./repo --git-dir=./repo/.git pull";
+    String copyScript = "cp ./repo/questions/* ./questions/";
+
     @Override
     public void onMessage(final MessageEvent event) throws Exception {
         String message = Colors.removeFormattingAndColors(event.getMessage().trim());

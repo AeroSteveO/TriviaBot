@@ -11,7 +11,7 @@
 
 
 
-package Objects;
+package rapternet.irc.bots.triviabot.objects;
 
 import java.io.BufferedWriter;
 import java.io.File;

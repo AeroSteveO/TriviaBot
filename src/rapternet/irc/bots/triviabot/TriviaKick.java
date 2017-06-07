@@ -4,12 +4,12 @@
 * and open the template in the editor.
 */
 
-package TriviaBot;
+package rapternet.irc.bots.triviabot;
 
-import Objects.TimedWaitForQueue;
-import Objects.Question;
-import Objects.Answer;
-import static TriviaBot.TriviaMain.gameList;
+import rapternet.irc.bots.triviabot.objects.TimedWaitForQueue;
+import rapternet.irc.bots.triviabot.objects.Question;
+import rapternet.irc.bots.triviabot.objects.Answer;
+import static rapternet.irc.bots.triviabot.TriviaMain.gameList;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;

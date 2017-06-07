@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package TriviaBot;
+package rapternet.irc.bots.triviabot;
 
 import java.util.ArrayList;
 import org.pircbotx.PircBotX;

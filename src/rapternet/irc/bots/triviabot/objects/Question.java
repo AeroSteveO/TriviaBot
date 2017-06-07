@@ -4,7 +4,7 @@
 * and open the template in the editor.
 */
 
-package Objects;
+package rapternet.irc.bots.triviabot.objects;
 
 import java.io.File;
 import java.io.FileNotFoundException;

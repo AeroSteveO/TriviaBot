@@ -4,18 +4,18 @@
  * and open the template in the editor.
  */
 
-package TriviaBot;
+package rapternet.irc.bots.triviabot;
 
-import Objects.Answer;
-import Objects.GameList;
-import Objects.Question;
-import Objects.Score;
-import Objects.Score.ScoreArray;
+import rapternet.irc.bots.triviabot.objects.Answer;
+import rapternet.irc.bots.triviabot.objects.GameList;
+import rapternet.irc.bots.triviabot.objects.Question;
+import rapternet.irc.bots.triviabot.objects.Score;
+import rapternet.irc.bots.triviabot.objects.Score.ScoreArray;
 import org.pircbotx.Colors;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
-import Objects.Vote.VoteLog;
-import Utils.TextUtils;
+import rapternet.irc.bots.triviabot.objects.Vote.VoteLog;
+import rapternet.irc.bots.triviabot.utils.TextUtils;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -91,31 +91,25 @@ public class TriviaMain extends ListenerAdapter{
             String[] cmdSplit = command.split(" ");
             
             // Admin start
-            if (command.equalsIgnoreCase("start")
-                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
+            if (command.equalsIgnoreCase("start")) {
+                    //&&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
                 
                 runTrivia = true;
             }
             // User start
-            else if (command.equalsIgnoreCase("start")){
-                startVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
-            }
+//            else if (command.equalsIgnoreCase("start")){
+//                startVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
+//            }
             // Admin stop
-            else if (command.equalsIgnoreCase("stop")
-                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
+            else if (command.equalsIgnoreCase("stop")) {
+                    //&&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
                 
                 runTrivia = false;
             }
             // User stop
-            else if (command.equalsIgnoreCase("stop")){
-                stopVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
-            }
-            // Admin stop
-            else if (command.equalsIgnoreCase("stop")
-                    &&Global.botAdmins.contains(event.getUser().getNick())&&event.getUser().isVerified()){
-                
-                runTrivia = false;
-            }
+//            else if (command.equalsIgnoreCase("stop")){
+//                stopVotes.addVote(event.getUser().getNick(),event.getChannel().getName());
+//            }
             
             else if (cmdSplit[0].equalsIgnoreCase("report")&&!gameList.contains(new String[] {gameChan, "trivia", "long"})){
                 if (cmdSplit.length==2){
@@ -125,7 +119,7 @@ public class TriviaMain extends ListenerAdapter{
                         else{
                             TextUtils.addToDoc("TriviaQuestionIssues.txt", event.getUser().getNick()+" is reporting: "+currentQuestion.getRaw());
                             event.getBot().sendIRC().message(event.getChannel().getName(),"Question: "+Colors.RED+currentQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
-                            event.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+event.getUser().getNick());
+                            event.getBot().sendIRC().message(Global.botOwner, event.getUser().getNick() + " has reported: " + currentQuestion.getRaw());
                         }
                     }
                     else if (cmdSplit[1].equalsIgnoreCase("previous")){
@@ -134,7 +128,7 @@ public class TriviaMain extends ListenerAdapter{
                         else{
                             TextUtils.addToDoc("TriviaQuestionIssues.txt", event.getUser().getNick()+" is reporting: "+previousQuestion.getRaw());
                             event.getBot().sendIRC().message(event.getChannel().getName(),"Question: "+Colors.RED+previousQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
-                            event.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+event.getUser().getNick());
+                            event.getBot().sendIRC().message(Global.botOwner, event.getUser().getNick() + " has reported: " + previousQuestion.getRaw());
                         }
                     }
                     else{
@@ -421,7 +415,7 @@ public class TriviaMain extends ListenerAdapter{
                                 if(cmdSplit[1].equalsIgnoreCase("current")){
                                     TextUtils.addToDoc("TriviaQuestionIssues.txt", currentEvent.getUser().getNick()+" is reporting: "+currentQuestion.getRaw());
                                     currentEvent.getBot().sendIRC().message(currentEvent.getChannel().getName(),"Question: "+Colors.RED+currentQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
-                                    currentEvent.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+currentEvent.getUser().getNick());
+                                    currentEvent.getBot().sendIRC().message(Global.botOwner, currentEvent.getUser().getNick() + " has reported: " + currentQuestion.getRaw());
                                 }
                                 else if (cmdSplit[1].equalsIgnoreCase("previous")){
                                     if (previousQuestion == null){
@@ -430,7 +424,7 @@ public class TriviaMain extends ListenerAdapter{
                                     else{
                                         TextUtils.addToDoc("TriviaQuestionIssues.txt", currentEvent.getUser().getNick()+" is reporting: "+previousQuestion.getRaw());
                                         currentEvent.getBot().sendIRC().message(currentEvent.getChannel().getName(),"Question: "+Colors.RED+previousQuestion.getQuestion()+Colors.NORMAL+" has been marked for correction");
-                                        currentEvent.getBot().sendIRC().message(Global.botOwner, "A new question has been reported by "+currentEvent.getUser().getNick());
+                                        currentEvent.getBot().sendIRC().message(Global.botOwner, currentEvent.getUser().getNick() + " has reported: " + previousQuestion.getRaw());
                                     }
                                 }
                                 else{
