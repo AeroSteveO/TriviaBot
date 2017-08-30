@@ -80,11 +80,7 @@ public class Question {
     public String getQuestion(){
         return this.question;
     }
-    
-    public int getClueCount(){
-        return this.runnable.getCount();
-    }
-    
+        
     private String loadRandomQuestionFromFile(){
         ArrayList<File> fileList = getQuestionFileList();
         File randomFile = fileList.get((int) (Math.random()*fileList.size()-1));

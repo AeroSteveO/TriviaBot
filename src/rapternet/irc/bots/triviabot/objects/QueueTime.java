@@ -41,18 +41,6 @@ public  class QueueTime implements Runnable {
         this.bot=bot;
     }
     
-    public QueueTime(MessageEvent event, int time, int key) {
-        this.time = time;
-        this.chan = event.getChannel();
-        this.user = event.getBot().getUserBot();
-        this.key = key;
-        this.bot = Global.bot;
-    }
-        
-    public void interrupt(){
-        this.t.interrupt();
-    }
-    
     public void giveT(Thread t) {
         this.t = t;
     }

@@ -64,11 +64,7 @@ public class QuestionUpdater implements Runnable{
         this.event = event;
         this.updateKey = updateKey;
     }
-    
-    public int getCount(){
-        return this.counter;
-    }
-    
+        
     public void giveT(Thread t) {
         this.t = t;
     }
