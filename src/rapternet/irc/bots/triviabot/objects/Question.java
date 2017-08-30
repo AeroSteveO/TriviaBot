@@ -47,38 +47,14 @@ public class Question {
     public Question(){
         getNewQuestion();
     }
-    
-    public Question(MessageEvent event, Answer answer, int time ){
-        getNewQuestion();
-        this.runnable = new QuestionUpdater(event,answer, time);
-        this.t = new Thread(this.runnable);
-        this.runnable.giveT(t);
-        this.t.start();
-    }
-    
-    public void startQuestionUpdates(MessageEvent event, Answer answer, int time){
-        this.runnable = new QuestionUpdater(event, answer, time);
-        this.t = new Thread(runnable);
-        this.runnable.giveT(t);
-        this.t.start();
-    }
-    
-    public void startQuestionUpdates(MessageEvent event, Answer answer, int time, int key){
-        this.key = key;
-        this.runnable = new QuestionUpdater(event, answer, time, this.key);
-        this.t = new Thread(runnable);
-        this.runnable.giveT(t);
-        this.t.start();
-    }
-    
+        
     public void startQuestionUpdates(MessageEvent event, int time, int key, int updateKey){
         this.key = key;
         this.updateKey = updateKey;
         this.runnable = new QuestionUpdater(event, time, this.key, this.updateKey);
         this.t = new Thread(runnable);
         this.runnable.giveT(t);
-        this.t.start();
-        
+        this.t.start(); 
     }
     
     public void endQuestionUpdates() throws InterruptedException{

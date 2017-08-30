@@ -48,25 +48,13 @@ public class QuestionUpdater implements Runnable{
     private int counter;  // Number of clues given by the question updater
     private int updateKey = 0;
     
-    QuestionUpdater(MessageEvent event, Answer answer, int time){
-        this.bot = event.getBot();
-        this.channel = event.getChannel().getName();
-        this.answer = answer;
-        this.running = true;
-        this.time = time; // Seconds
-        this.event = event;
-    }
-    
-    QuestionUpdater(MessageEvent event, Answer answer, int time, int key){
-        this.bot = event.getBot();
-        this.channel = event.getChannel().getName();
-        this.answer = answer;
-        this.running = true;
-        this.time = time; // Seconds
-        this.key = key;
-        this.event = event;
-    }
-    
+    /**
+     * 
+     * @param event The event to send a response back through for signaling the question cycle and clue cycle
+     * @param time The amount of time to wait between clues (Seconds)
+     * @param endKey This key is sent out in an event to signal the end of the trivia question cycle
+     * @param updateKey This key is sent out in an event to signal the trivia system to give another clue
+     */
     QuestionUpdater(MessageEvent event, int time, int endKey, int updateKey){
         this.bot = event.getBot();
         this.channel = event.getChannel().getName();
