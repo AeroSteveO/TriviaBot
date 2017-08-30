@@ -373,11 +373,8 @@ public class TriviaMain extends ListenerAdapter{
                     else{
                         event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
                         
-                        triviaQuestion.endQuestionUpdates();
-                        previousQuestion = triviaQuestion;
-                        triviaQuestion = new Question();
-                        currentQuestion = triviaQuestion;
                         
+                        triviaQuestion = getNextTriviaQuestion(triviaQuestion);
                         key=(int) (Math.random()*100000+1);
                         updateKey = (int) (Math.random()*100000+1);
                         triviaAnswer = new Answer(triviaQuestion.getAnswer());
@@ -456,10 +453,7 @@ public class TriviaMain extends ListenerAdapter{
 //                                event.getBot().sendIRC().message(triviaChan,"No one got it. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
                                 event.getBot().sendIRC().message(triviaChan,"This question will be skipped. The answer was: "+Colors.BOLD+Colors.RED+triviaQuestion.getAnswer());
                                 
-                                triviaQuestion.endQuestionUpdates();
-                                previousQuestion = triviaQuestion;
-                                triviaQuestion = new Question();
-                                currentQuestion = triviaQuestion;
+                                triviaQuestion = getNextTriviaQuestion(triviaQuestion);
                                 
                                 key=(int) (Math.random()*100000+1);
                                 updateKey = (int) (Math.random()*100000+1);
@@ -554,14 +548,11 @@ public class TriviaMain extends ListenerAdapter{
                         if (levels.size()>counter){
                             currentGame.addScore(currentEvent.getUser().getNick(), levels.get(counter));
                             currentEvent.getBot().sendIRC().message(triviaChan,levels.get(counter)+" points have been added to your score");
-                        }
+                    }
                         counter = 0;
                         
-                        triviaQuestion.endQuestionUpdates();
-                        previousQuestion = triviaQuestion;
-                        triviaQuestion = new Question();
-                        currentQuestion = triviaQuestion;
-                        
+                        triviaQuestion = getNextTriviaQuestion(triviaQuestion);
+
                         key=(int) (Math.random()*100000+1);
                         updateKey = (int) (Math.random()*100000+1);
                         triviaAnswer = new Answer(triviaQuestion.getAnswer());
@@ -642,4 +633,10 @@ public class TriviaMain extends ListenerAdapter{
         if (modified)
             scores.saveToJSON();
     }
-}
+}    private Question getNextTriviaQuestion(Question triviaQuestion) throws InterruptedException {
+        Question newQuestion = new Question();
+        triviaQuestion.endQuestionUpdates();
+        previousQuestion = triviaQuestion;
+        currentQuestion = newQuestion;
+        return newQuestion;
+    }
