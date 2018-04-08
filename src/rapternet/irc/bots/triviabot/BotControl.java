@@ -61,10 +61,7 @@ public class BotControl extends ListenerAdapter{
             Thread.sleep(5000); // wait between killing the ghost to changing nick and registering
             event.getBot().sendIRC().changeNick(Global.mainNick);
             event.getBot().sendIRC().message("NickServ", "identify " + Global.nickPass);
-//            Global.channels.removeDupes();
-//            for (int i=0;i<Global.channels.size();i++){
-//                event.getBot().sendIRC().joinChannel(Global.channels.get(i).toString());
-//            }
+
         }
         if (message.equalsIgnoreCase("!ram")){
             if(event.getUser().getNick().equalsIgnoreCase(Global.botOwner)){
@@ -115,7 +112,6 @@ public class BotControl extends ListenerAdapter{
             if (message.toLowerCase().contains("#")){
                 event.getBot().sendIRC().message(event.getChannel().getName(),"Joining #" + chan[1]);
                 event.getBot().sendIRC().joinChannel("#" + chan[1]);
-//                Global.channels.add(new ChannelStore("#"+chan[1]));
             }
             else
                 event.getBot().sendIRC().message(event.getChannel().getName(),chan[chan.length-1] + " is not a channel");
@@ -132,13 +128,11 @@ public class BotControl extends ListenerAdapter{
                 else {
                     c.send().part();
                     event.respond("Parted from " + chan[1] + ".");
-//                    Global.channels.remove(Global.channels.getChanIdx("#"+chan[1]));
                 }
             } // command the bot to part the current channel that the command was sent from
             else if ((event.getChannel().isOwner(event.getUser())||event.getUser().getNick().equals(Global.botOwner))&&event.getUser().isVerified()&&(message.endsWith("leave"))){//||message.equalsIgnoreCase("!part"))){
                 
                 event.getChannel().send().part("Goodbye");
-//                Global.channels.remove(Global.channels.getChanIdx(event.getChannel().getName().toString()));
             }
         }
     }

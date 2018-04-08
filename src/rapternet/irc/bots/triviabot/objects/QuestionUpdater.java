@@ -8,6 +8,7 @@ package rapternet.irc.bots.triviabot.objects;
 
 import rapternet.irc.bots.triviabot.Global;
 import org.pircbotx.PircBotX;
+import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.MessageEvent;
 
 /**
@@ -98,7 +99,7 @@ public class QuestionUpdater implements Runnable{
                     this.bot.sendIRC().message(this.channel,"Clue: "+this.answer.giveClue());
                 
                 if (this.running && this.updateKey!=0){
-                    bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(updateKey)));
+                    Utils.dispatchEvent(Global.bot, new MessageEvent(Global.bot,event.getChannel(),event.getChannel().getName(), bot.getUserBot(), event.getBot().getUserBot(),Integer.toString(updateKey), event.getTags()));
                 }
                 
                 Thread.sleep(this.time*1000);
@@ -110,7 +111,7 @@ public class QuestionUpdater implements Runnable{
         }
         
         if (key != 0 && this.running){
-            bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,event.getChannel(),event.getBot().getUserBot(),Integer.toString(key)));
+            Utils.dispatchEvent(Global.bot, new MessageEvent(Global.bot,event.getChannel(),event.getChannel().getName(), bot.getUserBot(), event.getBot().getUserBot(),Integer.toString(key), event.getTags()));
         }
     }
 }

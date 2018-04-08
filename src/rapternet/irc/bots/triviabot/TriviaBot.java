@@ -73,7 +73,6 @@ import java.util.logging.Logger;
 import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
-import org.pircbotx.Configuration.*;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.InviteEvent;
@@ -86,8 +85,6 @@ import org.pircbotx.hooks.managers.BackgroundListenerManager;
  * @author Steve-O
  */
 public class TriviaBot extends ListenerAdapter {
-//    String updateScript = "git --work-tree=/home/autodl/TriviaBot2/repo --git-dir=/home/autodl/TriviaBot2/repo/.git pull";
-//    String copyScript = "cp /home/autodl/TriviaBot2/repo/questions/* /home/autodl/TriviaBot2/questions/";
     
     String updateScript = "git --work-tree=./repo --git-dir=./repo/.git pull";
     String copyScript = "cp ./repo/questions/* ./questions/";

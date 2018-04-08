@@ -1,16 +1,3 @@
-//new simple settings class
-//one level, no nesting, accepts strings for all
-//only other accepted object is list
-//use list for channels
-//strings for
-//-server
-//-port
-//-nick
-//-password
-//-login
-
-
-
 package rapternet.irc.bots.triviabot.objects;
 
 import java.io.BufferedWriter;
@@ -74,7 +61,6 @@ import org.json.JSONTokener;
  *
  */
 public class SimpleSettings {
-//    Map<String, String> stuff = new TreeMap<String, String>();
     File file = new File("doNotSave");
     Map <String, Object> settings = Collections.synchronizedMap(new TreeMap<String, Object>( ));
     

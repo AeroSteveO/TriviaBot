@@ -53,7 +53,6 @@ public class TextUtils {
         return (loadText(file));
     }
     public static String loadText(File file) throws FileNotFoundException, IOException{
-//        File file =new File(filename);
         //if file doesnt exists, then create it
         if(!file.exists()){
             file.createNewFile();
@@ -87,7 +86,6 @@ public class TextUtils {
             }
             
             Scanner wordfile = new Scanner(file);
-//new File("wordlist.txt")
             ArrayList<String> wordls = new ArrayList<String>();
             while (wordfile.hasNext()){
                 wordls.add(wordfile.nextLine().trim());
@@ -102,7 +100,6 @@ public class TextUtils {
     
     //converts URL to string, primarily used to string-ify json text
     public static String readUrl(String urlString) throws Exception {
-//        System.out.println(urlString);
         BufferedReader reader = null;
         try {
             URL url = new URL(urlString);
@@ -132,11 +129,7 @@ public class TextUtils {
         //add request header
         con.setRequestProperty("User-Agent", USER_AGENT);
         
-//        con.setRequestProperty("X-Mashape-Key", key);
-        
         int responseCode = con.getResponseCode();
-//        System.out.println("\nSending 'GET' request to URL : " + url);
-//        System.out.println("Response Code : " + responseCode);
         
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -148,7 +141,6 @@ public class TextUtils {
         }
         in.close();
         
-//        System.out.println(response.toString());
         return response.toString();
     }
     

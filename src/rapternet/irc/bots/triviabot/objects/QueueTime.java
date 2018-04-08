@@ -10,6 +10,7 @@ import rapternet.irc.bots.triviabot.Global;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.Utils;
 import org.pircbotx.hooks.events.MessageEvent;
 
 /**
@@ -49,7 +50,7 @@ public  class QueueTime implements Runnable {
     public void run() {
         try { // No need to loop for this thread
             Thread.sleep(time*1000);
-            bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(Global.bot,chan,user,Integer.toString(key)));
+            Utils.dispatchEvent(Global.bot, new MessageEvent(Global.bot,chan,chan.getName(), bot.getUserBot(), bot.getUserBot(),Integer.toString(key), null));
         } catch (InterruptedException ex) {
             
         }

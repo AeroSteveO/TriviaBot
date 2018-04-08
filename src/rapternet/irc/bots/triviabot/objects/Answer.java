@@ -47,7 +47,6 @@ public class Answer {
     }
     
     public String giveClue(){
-//        int charLocation = (int) (Math.random()*this.answer.length()-1);
         boolean charChange = false;
         int numCharsLeft = 0;
         
@@ -58,7 +57,6 @@ public class Answer {
         }
         
         if (numCharsLeft>1){
-//            int charLocation = (int) (Math.random()*numCharsLeft-1);
             int i=(int) (Math.random()*numCharsLeft-1)-1;
             if (i<0)
                 i=0;
@@ -86,25 +84,6 @@ public class Answer {
                 }
             }
         }
-//        while (!charChange){
-//            try{
-////                if (!Character.isDigit(maskedAnswer.charAt(charLocation))&&!Character.isLetter(maskedAnswer.charAt(charLocation))){
-////                }
-//                if (this.maskedAnswer.charAt(charLocation)=='*'){
-//                    if (charLocation<=answer.length()-2)
-//                        this.maskedAnswer=this.maskedAnswer.substring(0,charLocation)+this.answer.charAt(charLocation)+this.maskedAnswer.substring(charLocation+1);
-//                    else
-//                        this.maskedAnswer=this.maskedAnswer.substring(0,charLocation)+this.answer.charAt(charLocation);
-//                    charChange = true;
-//                }
-//            }
-//            catch(Exception ex){
-//                ex.printStackTrace();
-//                System.out.println(ex.getMessage());
-//            }
-//            
-//            charLocation = (int) (Math.random()*this.answer.length()-1);
-//        }
         return this.maskedAnswer;
     }
     
