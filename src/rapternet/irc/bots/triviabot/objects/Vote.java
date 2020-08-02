@@ -49,7 +49,6 @@ public class Vote {
     private DateTime expiration;
     private String voter;
     private String channel;
-//    private static int numVotesToRun = 3;
     
     public Vote(String nick){
         this.expiration = new DateTime().plusMinutes(10);

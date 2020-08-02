@@ -76,7 +76,7 @@ public class TriviaMain extends ListenerAdapter{
     public static Question currentQuestion = null;
     
     ScoreArray scores = new ScoreArray();
-    String filename = "scores.json";
+    String filename = Env.CONFIG_LOCATION + "scores.json";
     boolean loaded = startScores();
     ArrayList<Integer> levels = scoreLevels();
     public static GameList gameList = new GameList();

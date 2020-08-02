@@ -86,8 +86,8 @@ import org.pircbotx.hooks.managers.BackgroundListenerManager;
  */
 public class TriviaBot extends ListenerAdapter {
     
-    String updateScript = "git --work-tree=./repo --git-dir=./repo/.git pull";
-    String copyScript = "cp ./repo/questions/* ./questions/";
+    String updateScript = "git --work-tree="+ Env.CONFIG_LOCATION + "/repo --git-dir="+ Env.CONFIG_LOCATION + "/repo/.git pull";
+    String copyScript = "cp "+ Env.CONFIG_LOCATION + "/repo/questions/* "+ Env.CONFIG_LOCATION + "/questions/";
 
     @Override
     public void onMessage(final MessageEvent event) throws Exception {
@@ -197,7 +197,7 @@ public class TriviaBot extends ListenerAdapter {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SimpleSettings serverSettings = new SimpleSettings("BotSettings.json");
+        SimpleSettings serverSettings = new SimpleSettings(Env.CONFIG_LOCATION + "BotSettings.json");
         if (serverSettings.isEmpty()){
             serverSettings.create("server", "irc.yoursite.com");
             serverSettings.create("nick","TriviaBot");

@@ -26,8 +26,8 @@ import org.pircbotx.hooks.events.MessageEvent;
 public class TriviaRequest extends ListenerAdapter {
     ArrayList<String> questionRequests = getDefinitions();
     ArrayList<String> words = getWordsFromDefs(questionRequests);
-    String requestFileName = "questionRequests.txt";
-    String requestLogName   = "requestLog.txt";
+    String requestFileName = Env.CONFIG_LOCATION + "questionRequests.txt";
+    String requestLogName   = Env.CONFIG_LOCATION + "requestLog.txt";
     
     @Override
     public void onMessage(MessageEvent event) throws FileNotFoundException, InterruptedException {

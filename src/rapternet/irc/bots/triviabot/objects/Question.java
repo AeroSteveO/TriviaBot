@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.pircbotx.hooks.events.MessageEvent;
+import rapternet.irc.bots.triviabot.Env;
 
 /**
  *
@@ -90,7 +91,7 @@ public class Question {
     }
     
     private ArrayList<File> getQuestionFileList(){
-        File folder = new File("questions/");
+        File folder = new File(Env.CONFIG_LOCATION + "questions/");
         File[] listOfFilesAndFolders = folder.listFiles();
         ArrayList<File> listOfFiles = new ArrayList<>();// = new File[];
         for (int i = 0; i < listOfFilesAndFolders.length; i++) {
