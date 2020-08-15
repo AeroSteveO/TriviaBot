@@ -22,6 +22,13 @@ Each round, a file is selected at random, then a line is selected at random from
 
 The answer is then masked and the question is asked. Periodically, the bot unmask a letter of the current question. This happens three times before the answer is revealed.
 
+How do I get set up?
+--------------
+* Building can be done using ant or docker
+  * docker build . -t triviabot
+  * ant clean-build
+* .jar dependencies are included in the repo to provide a baseline configuration
+
 What the bot doesn't do.
 ------------------------
 
