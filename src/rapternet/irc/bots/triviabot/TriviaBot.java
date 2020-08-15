@@ -106,7 +106,7 @@ public class TriviaBot extends ListenerAdapter {
                 if(Global.botAdmins.contains(event.getUser().getNick())){
                     event.getBot().sendIRC().notice(event.getUser().getNick(), "Admin Commands: set <user> <score>, start, stop, skip, save");
                 }
-                event.getBot().sendIRC().notice(event.getUser().getNick(), "The full command list can be found at http://bit.ly/1rjHlt8");
+                event.getBot().sendIRC().notice(event.getUser().getNick(), "The full command list can be found at https://github.com/AeroSteveO/TriviaBot/blob/master/Commands.md");
             }
             
             else if (command.equalsIgnoreCase("update") && event.getUser().getNick().equalsIgnoreCase(Global.botOwner) && event.getUser().isVerified()) {
