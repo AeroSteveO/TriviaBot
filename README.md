@@ -29,6 +29,26 @@ How do I get set up?
   * ant clean-build
 * .jar dependencies are included in the repo to provide a baseline configuration
 
+Docker Environment
+------------------
+All of the environment variables the bot loads from docker are put into the configuration files at first start. If the config files exist, then these will not be used, and the config file settings will be used instead.
+* BOT_CONFIG_FOLDER
+  * The path to use for all of the files needed by the bot
+* BOT_NICK
+  * The nickname to use on IRC, this is loaded into the configuration file and should be updated there after the first startup
+* BOT_PASSWORD
+  * The nickname to use on IRC, this is loaded into the configuration file and should be updated there after the first startup
+* BOT_OWNER_NICK
+  * The nickname to use on IRC, this is loaded into the configuration file and should be updated there after the first startup
+* BOT_IRC_PORT
+  * The IRC server port, this is loaded into the configuration file and should be updated there after the first startup
+* BOT_LOGIN
+  * The nickname to use on IRC, this is loaded into the configuration file and should be updated there after the first startup
+* BOT_IRC_ADDRESS
+  * The IRC server address, this is loaded into the configuration file and should be updated there after the first startup
+* BOT_CHANNEL_LIST
+  * A comma separated list of channels to join, this is loaded into the configuration file and should be updated there after the first startup
+
 What the bot doesn't do.
 ------------------------
 
