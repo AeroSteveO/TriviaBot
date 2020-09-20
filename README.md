@@ -7,6 +7,8 @@ https://github.com/rawsonj/triviabot
 
 Bot is built using PIRCBOTX 2.0.1
 
+[Bot commands](Commands.md) are available with descriptions of what they do
+
 Features
 --------
 
